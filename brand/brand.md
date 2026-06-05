@@ -91,7 +91,9 @@ Avoid: jargon, hype-y superlatives, anything that sounds like enterprise SaaS.
 
 ## Status of this spec
 - ✅ Color system — complete, sampled from the official Color guidelines.
-- ⛔ Typography — fallback only; needs the Type section / font files.
+- ✅ Primary hierarchy — confirmed: Teal primary, Purple accent.
+- ◻️ Typography — confirmed to ship on **Inter** for now; swap when the Type section / font files arrive.
 - ⛔ Logo — file not yet provided.
-- ⛔ References / exemplars — empty; needs the swipe file from the human.
+- ⛔ References — none yet; exemplars (below) seed the swipe file in the meantime.
+- ◻️ Exemplars — human is providing our own correct past assets.
 - ◻️ Spacing / radius — sensible defaults; confirm against the brand book.

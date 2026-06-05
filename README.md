@@ -60,10 +60,33 @@ references/seeds — not from re-prompting an image model and hoping.
 
 Built **one phase at a time**, top to bottom. Later phases depend on earlier artifacts.
 
-- [ ] **Phase 0** — Brand spec (no code) — the dependency for everything
-- [ ] **Phase 1** — Template renderer MVP (CLI)
+- [x] **Phase 0** — Brand spec (`brand/brand.json`, `brand/brand.md`) — Glowforge color system locked in
+- [x] **Phase 1** — Template renderer MVP (CLI) — feature-section → PNG via Playwright
 - [ ] **Phase 2** — Agent core (Claude Agent SDK, local CLI)
 - [ ] **Phase 3** — Slack integration (Bolt + Socket Mode)
 - [ ] **Phase 4** — Image generation tool
 - [ ] **Phase 5** — SVG/code path for branded graphics
 - [ ] **Phase 6** — Iteration & polish
+
+## Running (Phase 1)
+
+```bash
+npm install                 # deps (Chromium comes via @sparticuz/chromium; CDN is blocked here)
+npm run render:sample       # renders sample feature sections to /output
+
+# Ad-hoc render from the CLI:
+npm run render -- --template feature-section \
+  --eyebrow "New in Glowforge" --headline "Make Something Magical." \
+  --body "Your idea, made real." --cta "Get started" --theme teal \
+  --out output/demo.png
+```
+
+Themes: `light` (default), `cream`, `teal`, `ink`. Pass `--image path.png` to fill
+the image slot; otherwise a branded placeholder is rendered.
+
+### Rendering notes
+- Chromium is sourced from npm (`@sparticuz/chromium`) and driven by `playwright-core`,
+  because this environment blocks Playwright's browser CDN. Set `PLAYWRIGHT_CHROMIUM_PATH`
+  to use a system Chromium instead.
+- Inter is embedded from `@fontsource/inter` as base64 `@font-face`, so rendering is
+  deterministic and offline (no Google Fonts CDN dependency).
