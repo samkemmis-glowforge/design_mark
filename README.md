@@ -64,7 +64,7 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 - [x] **Phase 1** — Template renderer MVP (CLI) — feature-section → PNG via Playwright
 - [x] **Phase 2** — Agent core (Claude Agent SDK, local CLI) — creative-director persona, routes briefs, asks before guessing
 - [x] **Phase 3** — Slack integration (Bolt + Socket Mode) — thread = session, in-thread Q&A, PNG uploads
-- [~] **Phase 4** — Image generation tool — pluggable `generate_image` + offline placeholder provider done; real backend pending provider choice (see note)
+- [x] **Phase 4** — Image generation tool — pluggable `generate_image`; offline placeholder + Gemini adapter (set `GEMINI_API_KEY` + `IMAGE_PROVIDER=gemini`)
 - [x] **Phase 5** — SVG/code path for branded graphics — agent authors SVG/HTML, crisp text via render_svg
 - [ ] **Phase 6** — Iteration & polish
 
@@ -128,10 +128,20 @@ machine or a small host) for the bot to stay online.
 ## Image generation (Phase 4)
 
 The photoreal route lives behind **one pluggable interface** (`agent/tools/generate-image.ts`),
-selected by the `IMAGE_PROVIDER` env var. The default `placeholder` provider is
-deterministic and offline — it renders an on-brand stand-in so the pipeline works
-without an external API. To use a real model, add an `ImageProvider` (one `generate()`
-method), register it in `PROVIDERS`, and set `IMAGE_PROVIDER=<name>`.
+selected by the `IMAGE_PROVIDER` env var:
+
+- `placeholder` (default) — deterministic, offline, renders an on-brand stand-in so the
+  pipeline works without any external API.
+- `gemini` — real generation via the Gemini image models ("Nano Banana" family). It
+  passes brand references as input parts to keep the look on-brand. To use it:
+  ```bash
+  export IMAGE_PROVIDER=gemini
+  export GEMINI_API_KEY=...                       # or GOOGLE_API_KEY
+  export GEMINI_IMAGE_MODEL=gemini-2.5-flash-image # optional; default shown
+  ```
+
+Add another backend (OpenAI, Flux, …) by implementing one `ImageProvider.generate()`
+method and registering it in `PROVIDERS`.
 
 > **Note on Canva:** Canva's Connect API does **not** expose Magic Media text-to-image
 > as a programmatic endpoint. Its public APIs are Autofill, Brand Templates, asset

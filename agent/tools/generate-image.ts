@@ -1,61 +1,29 @@
 import { loadBrand, brandFontFamilies } from "../brand.js";
 import { fontFaceStyles, fontStack } from "../render/fonts.js";
 import { htmlToPng } from "../render/html-to-png.js";
+import { dimsFor, type ImageProvider, type ImageRequest, type ImageResult } from "./image-types.js";
+import { geminiProvider } from "./providers/gemini.js";
+
+export type { AspectRatio, ImageProvider, ImageRequest, ImageResult } from "./image-types.js";
+export { dimsFor } from "./image-types.js";
 
 /**
  * Image generation behind ONE pluggable interface (per the build plan: "wrap behind
  * one tool interface so the provider can be swapped").
  *
  * IMPORTANT: this route is only for photoreal / lifestyle scenes. Layout assets go
- * to render_template; crisp-text/vector graphics go to the SVG path. For our actual
+ * to render_template; crisp-text/vector graphics go to render_svg. For our actual
  * product UI, composite a real screenshot rather than generating the interface.
  *
  * Providers are selected by the IMAGE_PROVIDER env var. The default "placeholder"
  * provider is deterministic and offline — it produces an on-brand stand-in card so
- * the whole pipeline works without an external image API. Wire a real generation
- * backend (e.g. Gemini/Imagen, OpenAI, Flux) by adding an ImageProvider and
- * registering it below.
+ * the whole pipeline works without an external image API.
  */
-
-export type AspectRatio = "1:1" | "16:9" | "4:5" | "3:2" | "9:16";
-
-export interface ImageRequest {
-  prompt: string;
-  aspectRatio?: AspectRatio;
-  /** Paths to style-reference images to condition the look (from brand/references). */
-  references?: string[];
-  /** Output PNG path (absolute or repo-relative). */
-  outPath: string;
-}
-
-export interface ImageResult {
-  outPath: string;
-  width: number;
-  height: number;
-  provider: string;
-}
-
-export interface ImageProvider {
-  name: string;
-  generate(req: ImageRequest): Promise<ImageResult>;
-}
-
-const DIMS: Record<AspectRatio, { width: number; height: number }> = {
-  "1:1": { width: 1024, height: 1024 },
-  "16:9": { width: 1280, height: 720 },
-  "4:5": { width: 1024, height: 1280 },
-  "3:2": { width: 1280, height: 854 },
-  "9:16": { width: 720, height: 1280 },
-};
-
-export function dimsFor(ar: AspectRatio = "1:1") {
-  return DIMS[ar];
-}
 
 /**
  * Default provider: renders a deterministic, on-brand placeholder that states the
  * prompt and references. Lets the agent's photoreal route produce a visible asset
- * offline; swapping in a real model is a one-adapter change.
+ * offline; swapping in a real model is just `IMAGE_PROVIDER=gemini`.
  */
 const placeholderProvider: ImageProvider = {
   name: "placeholder",
@@ -85,7 +53,7 @@ const placeholderProvider: ImageProvider = {
         <div class="tag">generated scene · placeholder</div>
         <div class="prompt">${escapeHtml(req.prompt)}</div>
         ${refs}
-        <div class="meta">${width}×${height} · wire a real image model to replace this</div>
+        <div class="meta">${width}×${height} · set IMAGE_PROVIDER=gemini for a real scene</div>
       </div>
     </body></html>`;
     const res = await htmlToPng({ html, width, height, outPath: req.outPath });
@@ -99,8 +67,8 @@ function escapeHtml(s: string): string {
 
 const PROVIDERS: Record<string, ImageProvider> = {
   placeholder: placeholderProvider,
-  // gemini: geminiProvider,   // add real backends here
-  // openai: openaiProvider,
+  gemini: geminiProvider,
+  // openai: openaiProvider,   // add more backends here
 };
 
 export function getImageProvider(): ImageProvider {
@@ -113,7 +81,9 @@ export function getImageProvider(): ImageProvider {
 }
 
 /** Generate a photoreal/lifestyle image via the configured provider. */
-export async function generateImage(req: Omit<ImageRequest, "outPath"> & { outPath?: string }): Promise<ImageResult> {
+export async function generateImage(
+  req: Omit<ImageRequest, "outPath"> & { outPath?: string },
+): Promise<ImageResult> {
   const provider = getImageProvider();
   const outPath = req.outPath ?? `output/scene-${Date.now()}.png`;
   return provider.generate({ ...req, outPath });
