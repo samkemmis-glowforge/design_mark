@@ -1,12 +1,12 @@
 {
-  "$comment": "Glowforge brand design tokens. Color data is pixel-sampled from the official 'Glowforge Brand Identity Guidelines | Color' deck (the PDF's hex table was placeholder; swatches are authoritative). Typography, spacing, radius, and logo are marked needsConfirmation until the Type/Logo sections of the brand book are provided.",
+  "$comment": "Glowforge brand design tokens. Color data is pixel-sampled from the official 'Glowforge Brand Identity Guidelines | Color' deck (the PDF's hex table was placeholder; swatches are authoritative). Logo suite is now provided (see logo.files); primary teal is #16A0B0, matched to the official logomark and live-site CTAs (chosen over the deck's brighter #26B8CE swatch). Typography, spacing, radius remain needsConfirmation until the Type section / font files are provided.",
   "brand": {
     "name": "Glowforge",
     "tagline": "Make Something Magical.™",
     "personality": ["modern", "energetic", "creative", "fun", "personable"]
   },
   "colors": {
-    "primary": "#26B8CE",
+    "primary": "#16A0B0",
     "background": "#FFFFFF",
     "accent": "#821AAB",
     "text": "#12151A"
@@ -14,8 +14,8 @@
   "palette": {
     "teal": {
       "role": "primary",
-      "note": "Legacy hero color. Symbolizes the brand; used as the dominant identity color.",
-      "base": "#26B8CE",
+      "note": "Brand hero color, matched to the logomark and live-site CTAs. Dominant identity color for CTAs, accents, and line icons.",
+      "base": "#16A0B0",
       "tint": "#C9EDF2",
       "shade": "#0E454D",
       "temperature": "cool"
@@ -103,8 +103,17 @@
     "card": 16
   },
   "logo": {
-    "needsConfirmation": true,
-    "path": "brand/logo.svg",
-    "note": "Logo file not yet provided. Wordmark color flips per colorSystem.logoOnLight / logoOnDark."
+    "note": "Official logo suite provided. Primary lockup = lowercase black 'glowforge' wordmark under the teal 'bug' (pin/location mark with an embedded 'g'). On dark surfaces, flip the wordmark to white per colorSystem.logoOnDark; the bug stays teal.",
+    "files": {
+      "fullLockup": "brand/logo/logo-full.png",
+      "fullLockupSmall": "brand/logo/logo-full-250.png",
+      "bug": "brand/logo/bug-teal.png",
+      "bugOnWhite": "brand/logo/bug-teal-on-white.png",
+      "favicon": "brand/logo/favicon.png"
+    },
+    "bugTeal": "#16A0B0",
+    "icons": "brand/logo/icons/",
+    "clearspace": "Keep clear space around the lockup equal to the height of the bug's opening; never crowd, recolor, or stretch.",
+    "minWidthPx": { "fullLockup": 120, "bug": 24 }
   }
 }

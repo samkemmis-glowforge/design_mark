@@ -34,7 +34,14 @@ export interface Brand {
   };
   spacing: { unit: number; sectionPadding: number };
   radius: { button: number; card: number };
-  logo: { path: string; note?: string };
+  logo: {
+    note?: string;
+    files?: Record<string, string>;
+    bugTeal?: string;
+    icons?: string;
+    clearspace?: string;
+    minWidthPx?: Record<string, number>;
+  };
 }
 
 let cached: Brand | null = null;

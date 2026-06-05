@@ -23,7 +23,7 @@ per family) lives in `brand.json` under `palette`.
 
 | Family | Base | Use for |
 | --- | --- | --- |
-| **Teal** (primary) | `#26B8CE` | Hero backgrounds, primary surfaces, brand moments |
+| **Teal** (primary) | `#16A0B0` | CTAs, accents, line icons, hero/brand moments (matches logomark + live-site CTAs) |
 | **Purple** (accent) | `#821AAB` | High-energy contrast, highlights, CTAs against teal/cream |
 | **Cream/Sand** | `#F9E7CB` | Warm neutral surfaces, soft sections |
 | **Yellow** | `#FFE677` | Optimistic accents, highlights |
