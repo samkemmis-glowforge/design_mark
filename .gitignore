@@ -5,6 +5,10 @@ node_modules/
 output/
 !output/.gitkeep
 
+# Approved finals (kept locally, not in git)
+approved/
+!approved/.gitkeep
+
 # Environment / secrets
 .env
 .env.local

@@ -66,7 +66,7 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 - [x] **Phase 3** — Slack integration (Bolt + Socket Mode) — thread = session, in-thread Q&A, PNG uploads
 - [x] **Phase 4** — Image generation tool — pluggable `generate_image`; offline placeholder + Gemini adapter (set `GEMINI_API_KEY` + `IMAGE_PROVIDER=gemini`)
 - [x] **Phase 5** — SVG/code path for branded graphics — agent authors SVG/HTML, crisp text via render_svg
-- [ ] **Phase 6** — Iteration & polish
+- [x] **Phase 6** — Iteration & polish — critique loop, channel presets, versioned files, approve→finals
 
 ## Running (Phase 1)
 
