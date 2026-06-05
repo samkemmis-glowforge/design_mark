@@ -65,7 +65,7 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 - [x] **Phase 2** — Agent core (Claude Agent SDK, local CLI) — creative-director persona, routes briefs, asks before guessing
 - [x] **Phase 3** — Slack integration (Bolt + Socket Mode) — thread = session, in-thread Q&A, PNG uploads
 - [~] **Phase 4** — Image generation tool — pluggable `generate_image` + offline placeholder provider done; real backend pending provider choice (see note)
-- [ ] **Phase 5** — SVG/code path for branded graphics
+- [x] **Phase 5** — SVG/code path for branded graphics — agent authors SVG/HTML, crisp text via render_svg
 - [ ] **Phase 6** — Iteration & polish
 
 ## Running (Phase 1)

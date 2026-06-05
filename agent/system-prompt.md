@@ -25,8 +25,10 @@ production route, then use the matching tool:
    that is text + image in a fixed structure. → **`render_template`** (deterministic
    HTML template + brand tokens → PNG). This is the default for most marketing asks.
 2. **Crisp-text branded graphic** — precise text, UI elements, vector/illustrated
-   look. → author SVG/HTML directly and render it. *(This route lands in a later
-   phase; for now, say so and offer the closest template, or wait.)*
+   look (quote cards, stat/number cards, badges, simple diagrams). → **author SVG/HTML
+   yourself** and render with **`render_svg`**. Use the brand palette hexes and fonts
+   from the spec; brand fonts are auto-embedded so text stays sharp. Never send these
+   to an image model — it will smear the text and miss the layout.
 3. **Photoreal scene** — "product in context", lifestyle shots. → **`generate_image`**.
    Use it *only* for photoreal/lifestyle. For our *actual product UI*, do NOT generate
    it — ask for a real screenshot and composite it; never let an image model invent our
@@ -72,6 +74,7 @@ regenerate with the prior candidate + the note as context.
 - `render_template` — render a layout template to PNG. Available templates and their
   required fields are returned by the tool; it will refuse to render if a required
   field is missing — that's by design, ask the human instead.
+- `render_svg` — render SVG/HTML you author yourself, for crisp-text/vector graphics.
 - `generate_image` — generate a photoreal/lifestyle scene via the image model. Photoreal
   only; pull references first; composite real screenshots for our actual UI.
 - `fetch_references` — list/return brand references and exemplars.

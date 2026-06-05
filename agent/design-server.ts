@@ -3,6 +3,7 @@ import { createSdkMcpServer, tool } from "@anthropic-ai/claude-agent-sdk";
 import { renderTemplate } from "./tools/render-template.js";
 import { fetchReferences, type ReferenceKind } from "./tools/fetch-references.js";
 import { generateImage, type AspectRatio } from "./tools/generate-image.js";
+import { renderSvg } from "./tools/render-svg.js";
 import { listTemplates } from "../templates/index.js";
 
 /**
@@ -25,6 +26,7 @@ export const DESIGN_SERVER_NAME = "design";
 
 export const DESIGN_TOOL_NAMES = [
   "mcp__design__render_template",
+  "mcp__design__render_svg",
   "mcp__design__generate_image",
   "mcp__design__fetch_references",
   "mcp__design__ask_human",
@@ -79,6 +81,39 @@ export function buildDesignServer(transports: DesignHostTransports) {
         );
       } catch (err) {
         return text(`RENDER FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
+  const renderSvgTool = tool(
+    "render_svg",
+    "Render agent-authored SVG or HTML to PNG. Use this for crisp-text branded graphics: " +
+      "quote/stat cards, badges, simple diagrams, icon-style or vector looks — anything needing " +
+      "EXACT text and layout. Author the SVG/HTML yourself using the brand palette hexes and " +
+      "fonts from the spec; brand fonts are auto-embedded so text stays sharp and on-brand. " +
+      "Do NOT use an image model for this.",
+    {
+      markup: z.string().describe("The SVG (<svg …>) or HTML markup to render"),
+      width: z.number().optional().describe("Output width in px (default 1080)"),
+      height: z.number().optional().describe("Output height in px (default 1080)"),
+      outPath: z.string().optional().describe("Output PNG path; auto-named under output/ if omitted"),
+    },
+    async (args) => {
+      try {
+        const result = await renderSvg({
+          markup: args.markup,
+          width: args.width,
+          height: args.height,
+          outPath: args.outPath,
+        });
+        await transports.onAsset({ path: result.outPath, width: result.width, height: result.height });
+        return text(
+          `Rendered graphic → ${result.outPath} (${result.width}×${result.height}, ${(
+            result.bytes / 1024
+          ).toFixed(0)} KB). Shown to the art director; invite critique.`,
+        );
+      } catch (err) {
+        return text(`SVG RENDER FAILED: ${err instanceof Error ? err.message : String(err)}`);
       }
     },
   );
@@ -151,6 +186,6 @@ export function buildDesignServer(transports: DesignHostTransports) {
   return createSdkMcpServer({
     name: DESIGN_SERVER_NAME,
     version: "0.1.0",
-    tools: [renderTemplateTool, generateImageTool, fetchReferencesTool, askHumanTool],
+    tools: [renderTemplateTool, renderSvgTool, generateImageTool, fetchReferencesTool, askHumanTool],
   });
 }
