@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, extname, isAbsolute, resolve } from "node:path";
 import { REPO_ROOT } from "../../brand.js";
 import { dimsFor, type ImageProvider, type ImageRequest, type ImageResult } from "../image-types.js";
+import { pngSize } from "../../util/png-size.js";
 
 /**
  * Gemini-native image generation ("Nano Banana" family) via the Generative Language
@@ -40,14 +41,6 @@ export function buildGeminiRequest(prompt: string, aspectRatio: string, refs: Ge
       imageConfig: { aspectRatio },
     },
   };
-}
-
-/** Read PNG width/height from the IHDR header without an image library. */
-export function pngSize(buf: Buffer): { width: number; height: number } | null {
-  if (buf.length < 24) return null;
-  const sig = buf.readUInt32BE(0) === 0x89504e47 && buf.readUInt32BE(4) === 0x0d0a1a0a;
-  if (!sig) return null;
-  return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
 }
 
 async function refsToParts(paths: string[] | undefined): Promise<GeminiPart[]> {

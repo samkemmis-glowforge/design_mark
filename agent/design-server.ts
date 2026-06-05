@@ -5,6 +5,7 @@ import { fetchReferences, type ReferenceKind } from "./tools/fetch-references.js
 import { generateImage, type AspectRatio } from "./tools/generate-image.js";
 import { renderSvg } from "./tools/render-svg.js";
 import { approveAsset } from "./tools/approve-asset.js";
+import { renderCanvaTemplate, getCanvaTemplateFields, handoffToCanva } from "./tools/canva-template.js";
 import { resolvePreset, presetCatalog } from "./presets.js";
 import { listTemplates } from "../templates/index.js";
 
@@ -32,6 +33,9 @@ export const DESIGN_TOOL_NAMES = [
   "mcp__design__generate_image",
   "mcp__design__fetch_references",
   "mcp__design__approve_asset",
+  "mcp__design__canva_template",
+  "mcp__design__canva_template_fields",
+  "mcp__design__handoff_to_canva",
   "mcp__design__ask_human",
 ];
 
@@ -194,6 +198,72 @@ export function buildDesignServer(transports: DesignHostTransports) {
     },
   );
 
+  const canvaTemplateFieldsTool = tool(
+    "canva_template_fields",
+    "Inspect which named fields a Canva Brand Template expects, so you can fill them correctly. " +
+      "Requires a connected Canva integration.",
+    {
+      brandTemplateId: z.string().describe("The Canva brand template id"),
+    },
+    async (args) => {
+      try {
+        const fields = await getCanvaTemplateFields(args.brandTemplateId);
+        return text(JSON.stringify(fields, null, 2));
+      } catch (err) {
+        return text(`CANVA FIELDS FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
+  const canvaTemplateTool = tool(
+    "canva_template",
+    "Autofill one of the user's Canva Brand Templates with text and export it to PNG. Use this " +
+      "when the human references a Canva brand template (by id). Check fields first with " +
+      "canva_template_fields. Requires a connected Canva integration (Teams/Enterprise plan).",
+    {
+      brandTemplateId: z.string().describe("The Canva brand template id"),
+      fields: z
+        .record(z.string(), z.string())
+        .describe("Map of template field name -> text value (from canva_template_fields)"),
+      title: z.string().optional().describe("Optional title for the created design"),
+      outPath: z.string().optional().describe("Output PNG path; auto-named under output/ if omitted"),
+    },
+    async (args) => {
+      try {
+        const result = await renderCanvaTemplate({
+          brandTemplateId: args.brandTemplateId,
+          fields: args.fields,
+          title: args.title,
+          outPath: args.outPath,
+        });
+        await transports.onAsset({ path: result.outPath, width: result.width, height: result.height });
+        return text(
+          `Autofilled Canva template → ${result.outPath} (${result.width}×${result.height}, design ${result.designId}). ` +
+            `Shown to the art director; invite critique.`,
+        );
+      } catch (err) {
+        return text(`CANVA TEMPLATE FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
+  const handoffToCanvaTool = tool(
+    "handoff_to_canva",
+    "Push a finished local asset into the user's Canva uploads so they can hand-tweak it. " +
+      "Requires a connected Canva integration.",
+    {
+      path: z.string().describe("Path to the local asset to upload (e.g. an approved PNG)"),
+    },
+    async (args) => {
+      try {
+        const { assetId, name } = await handoffToCanva(args.path);
+        return text(`Uploaded "${name}" to the user's Canva (asset ${assetId}). It's in their Canva Uploads to edit.`);
+      } catch (err) {
+        return text(`CANVA HANDOFF FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
   const askHumanTool = tool(
     "ask_human",
     "Ask the art director a clarifying question and wait for their answer. Use this before producing when the brief is missing required details.",
@@ -216,6 +286,9 @@ export function buildDesignServer(transports: DesignHostTransports) {
       generateImageTool,
       fetchReferencesTool,
       approveAssetTool,
+      canvaTemplateFieldsTool,
+      canvaTemplateTool,
+      handoffToCanvaTool,
       askHumanTool,
     ],
   });

@@ -31,3 +31,6 @@ Thumbs.db
 /test-results/
 /playwright-report/
 /.cache/
+
+# Canva OAuth tokens
+.canva-tokens.json

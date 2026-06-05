@@ -9,7 +9,8 @@
     "render:sample": "tsx scripts/render-sample.ts",
     "typecheck": "tsc --noEmit",
     "agent": "tsx agent/index.ts",
-    "slack": "tsx slack/app.ts"
+    "slack": "tsx slack/app.ts",
+    "canva:auth": "tsx agent/canva/auth-cli.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.165",

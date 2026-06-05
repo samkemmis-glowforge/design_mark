@@ -67,6 +67,7 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 - [x] **Phase 4** — Image generation tool — pluggable `generate_image`; offline placeholder + Gemini adapter (set `GEMINI_API_KEY` + `IMAGE_PROVIDER=gemini`)
 - [x] **Phase 5** — SVG/code path for branded graphics — agent authors SVG/HTML, crisp text via render_svg
 - [x] **Phase 6** — Iteration & polish — critique loop, channel presets, versioned files, approve→finals
+- [x] **Phase 7** — Canva integration — autofill Brand Templates → PNG, asset handoff (OAuth PKCE)
 
 ## Running (Phase 1)
 
@@ -149,6 +150,28 @@ method and registering it in `PROVIDERS`.
 > brand-template autofill / asset handoff and image *editing*, but **not** for
 > programmatic photoreal *generation* — that needs a dedicated image model behind this
 > interface.
+
+## Canva integration (Phase 7)
+
+Canva complements (does not replace) the deterministic HTML path. Three uses:
+- **Autofill your Brand Templates** → PNG (`canva_template` / `canva_template_fields`).
+- **Handoff**: push a finished asset into your Canva uploads to hand-tweak (`handoff_to_canva`).
+- Image *generation* is **not** available via Canva's API — use the Gemini provider for that.
+
+**Setup (one-time):**
+1. Create a **Canva Connect app** at <https://www.canva.com/developers/> and add a return
+   URL `http://127.0.0.1:8976/callback`. Brand Templates require a Canva **Teams/Enterprise** plan.
+2. Export the app credentials and connect:
+   ```bash
+   export CANVA_CLIENT_ID=...
+   export CANVA_CLIENT_SECRET=...
+   npm run canva:auth        # opens an authorize URL; captures the redirect; saves tokens
+   ```
+   Tokens are stored in `.canva-tokens.json` (gitignored) and auto-refreshed.
+
+> The Canva client orchestration (autofill → export → download, asset upload) and the
+> OAuth PKCE flow are unit-tested offline with an injected `fetch`; the live API calls
+> require the app above and a Brand-Templates-capable plan.
 
 ### Rendering notes
 - Chromium is sourced from npm (`@sparticuz/chromium`) and driven by `playwright-core`,
