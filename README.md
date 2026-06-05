@@ -64,7 +64,7 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 - [x] **Phase 1** — Template renderer MVP (CLI) — feature-section → PNG via Playwright
 - [x] **Phase 2** — Agent core (Claude Agent SDK, local CLI) — creative-director persona, routes briefs, asks before guessing
 - [x] **Phase 3** — Slack integration (Bolt + Socket Mode) — thread = session, in-thread Q&A, PNG uploads
-- [ ] **Phase 4** — Image generation tool *(Canva Magic Media + stock as a provider)*
+- [~] **Phase 4** — Image generation tool — pluggable `generate_image` + offline placeholder provider done; real backend pending provider choice (see note)
 - [ ] **Phase 5** — SVG/code path for branded graphics
 - [ ] **Phase 6** — Iteration & polish
 
@@ -124,6 +124,21 @@ thread replies; you answer in-thread; rendered PNGs are uploaded to the thread.
 
 No public URL is needed (Socket Mode). The agent must run somewhere persistent (your
 machine or a small host) for the bot to stay online.
+
+## Image generation (Phase 4)
+
+The photoreal route lives behind **one pluggable interface** (`agent/tools/generate-image.ts`),
+selected by the `IMAGE_PROVIDER` env var. The default `placeholder` provider is
+deterministic and offline — it renders an on-brand stand-in so the pipeline works
+without an external API. To use a real model, add an `ImageProvider` (one `generate()`
+method), register it in `PROVIDERS`, and set `IMAGE_PROVIDER=<name>`.
+
+> **Note on Canva:** Canva's Connect API does **not** expose Magic Media text-to-image
+> as a programmatic endpoint. Its public APIs are Autofill, Brand Templates, asset
+> upload, image *modification* (mask+prompt edit), and export. So Canva is a fit for
+> brand-template autofill / asset handoff and image *editing*, but **not** for
+> programmatic photoreal *generation* — that needs a dedicated image model behind this
+> interface.
 
 ### Rendering notes
 - Chromium is sourced from npm (`@sparticuz/chromium`) and driven by `playwright-core`,

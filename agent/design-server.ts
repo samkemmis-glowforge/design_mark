@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createSdkMcpServer, tool } from "@anthropic-ai/claude-agent-sdk";
 import { renderTemplate } from "./tools/render-template.js";
 import { fetchReferences, type ReferenceKind } from "./tools/fetch-references.js";
+import { generateImage, type AspectRatio } from "./tools/generate-image.js";
 import { listTemplates } from "../templates/index.js";
 
 /**
@@ -24,6 +25,7 @@ export const DESIGN_SERVER_NAME = "design";
 
 export const DESIGN_TOOL_NAMES = [
   "mcp__design__render_template",
+  "mcp__design__generate_image",
   "mcp__design__fetch_references",
   "mcp__design__ask_human",
 ];
@@ -81,6 +83,43 @@ export function buildDesignServer(transports: DesignHostTransports) {
     },
   );
 
+  const generateImageTool = tool(
+    "generate_image",
+    "Generate a PHOTOREAL or lifestyle scene via the configured image model. Use ONLY for " +
+      "'product in context' / lifestyle shots — never for layout assets (use render_template) " +
+      "or crisp-text/vector graphics. For our actual product UI, do not generate it: ask the " +
+      "human for a real screenshot and composite it. Pull style references first.",
+    {
+      prompt: z.string().describe("Scene description for the image model"),
+      aspectRatio: z
+        .enum(["1:1", "16:9", "4:5", "3:2", "9:16"])
+        .optional()
+        .describe("Aspect ratio; defaults to 1:1"),
+      references: z
+        .array(z.string())
+        .optional()
+        .describe("Paths to style-reference images (from fetch_references) to condition the look"),
+      outPath: z.string().optional().describe("Output PNG path; auto-named under output/ if omitted"),
+    },
+    async (args) => {
+      try {
+        const result = await generateImage({
+          prompt: args.prompt,
+          aspectRatio: args.aspectRatio as AspectRatio | undefined,
+          references: args.references,
+          outPath: args.outPath,
+        });
+        await transports.onAsset({ path: result.outPath, width: result.width, height: result.height });
+        return text(
+          `Generated scene via "${result.provider}" → ${result.outPath} (${result.width}×${result.height}). ` +
+            `Shown to the art director; invite critique.`,
+        );
+      } catch (err) {
+        return text(`IMAGE GEN FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
   const fetchReferencesTool = tool(
     "fetch_references",
     "List relevant brand references (swipe file) and exemplars (approved past work) to condition production.",
@@ -112,6 +151,6 @@ export function buildDesignServer(transports: DesignHostTransports) {
   return createSdkMcpServer({
     name: DESIGN_SERVER_NAME,
     version: "0.1.0",
-    tools: [renderTemplateTool, fetchReferencesTool, askHumanTool],
+    tools: [renderTemplateTool, generateImageTool, fetchReferencesTool, askHumanTool],
   });
 }
