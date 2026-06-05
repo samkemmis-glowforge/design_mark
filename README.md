@@ -63,7 +63,7 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 - [x] **Phase 0** — Brand spec (`brand/brand.json`, `brand/brand.md`) — Glowforge color system locked in
 - [x] **Phase 1** — Template renderer MVP (CLI) — feature-section → PNG via Playwright
 - [x] **Phase 2** — Agent core (Claude Agent SDK, local CLI) — creative-director persona, routes briefs, asks before guessing
-- [ ] **Phase 3** — Slack integration (Bolt + Socket Mode)
+- [x] **Phase 3** — Slack integration (Bolt + Socket Mode) — thread = session, in-thread Q&A, PNG uploads
 - [ ] **Phase 4** — Image generation tool *(Canva Magic Media + stock as a provider)*
 - [ ] **Phase 5** — SVG/code path for branded graphics
 - [ ] **Phase 6** — Iteration & polish
@@ -99,6 +99,31 @@ pulls references, then renders. Set `AGENT_MODEL` to override the model.
 The agent core is host-agnostic: `agent/design-server.ts` takes injectable
 `askHuman` / `onAsset` transports, so Phase 3 swaps the terminal for a Slack thread
 without touching the agent logic.
+
+## Running in Slack (Phase 3)
+
+A Slack **thread is a session**: DM the bot (or @-mention it in a channel) to start
+one; replies in-thread continue it with full context. Clarifying questions arrive as
+thread replies; you answer in-thread; rendered PNGs are uploaded to the thread.
+
+**One-time Slack app setup:**
+1. Go to <https://api.slack.com/apps> → **Create New App** → **From a manifest**, and
+   paste `slack/manifest.yml`.
+2. **Socket Mode**: enable it, then **Basic Information → App-Level Tokens** → generate
+   a token with the `connections:write` scope → copy the `xapp-…` token.
+3. **Install App** to your workspace → copy the **Bot User OAuth Token** (`xoxb-…`).
+4. Export the env and run:
+   ```bash
+   export SLACK_BOT_TOKEN=xoxb-...
+   export SLACK_APP_TOKEN=xapp-...
+   export ANTHROPIC_API_KEY=sk-ant-...
+   npm run slack
+   ```
+5. In Slack, DM the bot: _"feature section announcing the layer tool"_ — it'll ask its
+   questions in-thread and post the candidate.
+
+No public URL is needed (Socket Mode). The agent must run somewhere persistent (your
+machine or a small host) for the bot to stay online.
 
 ### Rendering notes
 - Chromium is sourced from npm (`@sparticuz/chromium`) and driven by `playwright-core`,

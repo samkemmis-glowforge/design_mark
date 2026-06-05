@@ -1,0 +1,31 @@
+# Glowforge Design Agent — Slack app manifest
+# Create the app from this file: https://api.slack.com/apps → Create New App → From a manifest
+# Then enable Socket Mode and generate an App-Level Token (xapp-…) with connections:write.
+display_information:
+  name: Glowforge Design Agent
+  description: Your on-brand production designer. DM a brief or @-mention me in a thread.
+  background_color: "#26b8ce"
+features:
+  bot_user:
+    display_name: glowforge-design
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read   # see @-mentions
+      - chat:write          # post replies in threads
+      - files:write         # upload rendered PNGs
+      - im:history          # read DM threads
+      - im:read
+      - im:write            # open/respond in DMs
+      - channels:history    # follow channel threads where mentioned
+      - groups:history      # …and private channels
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: false
+  socket_mode_enabled: true
+  org_deploy_enabled: false
