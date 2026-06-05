@@ -1,0 +1,110 @@
+{
+  "$comment": "Glowforge brand design tokens. Color data is pixel-sampled from the official 'Glowforge Brand Identity Guidelines | Color' deck (the PDF's hex table was placeholder; swatches are authoritative). Typography, spacing, radius, and logo are marked needsConfirmation until the Type/Logo sections of the brand book are provided.",
+  "brand": {
+    "name": "Glowforge",
+    "tagline": "Make Something Magical.™",
+    "personality": ["modern", "energetic", "creative", "fun", "personable"]
+  },
+  "colors": {
+    "primary": "#26B8CE",
+    "background": "#FFFFFF",
+    "accent": "#821AAB",
+    "text": "#12151A"
+  },
+  "palette": {
+    "teal": {
+      "role": "primary",
+      "note": "Legacy hero color. Symbolizes the brand; used as the dominant identity color.",
+      "base": "#26B8CE",
+      "tint": "#C9EDF2",
+      "shade": "#0E454D",
+      "temperature": "cool"
+    },
+    "cream": {
+      "role": "secondary",
+      "note": "Warm neutral / soft surface.",
+      "base": "#F9E7CB",
+      "tint": "#FDF8F1",
+      "shade": "#5D564B",
+      "temperature": "warm"
+    },
+    "yellow": {
+      "role": "secondary",
+      "note": "Bright, optimistic accent.",
+      "base": "#FFE677",
+      "tint": "#FEF8DD",
+      "shade": "#7F733C",
+      "temperature": "warm"
+    },
+    "coral": {
+      "role": "secondary",
+      "note": "Warm, friendly accent.",
+      "base": "#FFA399",
+      "tint": "#FEE7E5",
+      "shade": "#5F3C39",
+      "temperature": "warm"
+    },
+    "purple": {
+      "role": "accent",
+      "note": "High-energy contrast color; pairs strongly against teal/cream.",
+      "base": "#821AAB",
+      "tint": "#DFC6E9",
+      "shade": "#30093F",
+      "temperature": "cool"
+    },
+    "blue": {
+      "role": "secondary",
+      "note": "Deep cobalt; cool anchor.",
+      "base": "#001195",
+      "tint": "#BFC4E4",
+      "shade": "#000637",
+      "temperature": "cool"
+    },
+    "rust": {
+      "role": "secondary",
+      "note": "Warm, earthy tone evoking wood/material.",
+      "base": "#63241A",
+      "tint": "#F7D6CB",
+      "shade": "#250D09",
+      "temperature": "warm"
+    },
+    "ink": {
+      "role": "neutral",
+      "note": "Near-black for text and dark backgrounds.",
+      "base": "#12151A",
+      "tint": "#C4C5C6",
+      "shade": "#090B0D",
+      "temperature": "neutral"
+    }
+  },
+  "colorSystem": {
+    "axes": ["warm↔cool", "light↔dark"],
+    "pairingRule": "Pick a color from one quadrant and pair it with a color diagonally across the spectrum to create a dynamic, contrasting two-color combination.",
+    "toneOnTone": "Within one family, combine a tint or shade with the base (choose by background) for legible, low-key depth.",
+    "logoOnLight": "On a light background, set the wordmark/type in a dark brand color (e.g. ink #12151A or a family shade).",
+    "logoOnDark": "On a dark background, always set the wordmark/type in white (#FFFFFF)."
+  },
+  "typography": {
+    "needsConfirmation": true,
+    "note": "The Color deck uses a rounded geometric sans-serif. The actual brand typeface was not in the provided (Color) section. 'Inter' is set as a safe rendering fallback until the Type section / font files are provided.",
+    "headingFont": "Inter",
+    "bodyFont": "Inter",
+    "scale": { "h1": 56, "h2": 36, "body": 18 },
+    "weights": { "heading": 600, "body": 400 }
+  },
+  "spacing": {
+    "needsConfirmation": true,
+    "unit": 8,
+    "sectionPadding": 64
+  },
+  "radius": {
+    "needsConfirmation": true,
+    "button": 8,
+    "card": 16
+  },
+  "logo": {
+    "needsConfirmation": true,
+    "path": "brand/logo.svg",
+    "note": "Logo file not yet provided. Wordmark color flips per colorSystem.logoOnLight / logoOnDark."
+  }
+}
