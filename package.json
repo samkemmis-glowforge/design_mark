@@ -7,13 +7,16 @@
   "scripts": {
     "render": "tsx agent/tools/render-template.ts",
     "render:sample": "tsx scripts/render-sample.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "agent": "tsx agent/index.ts"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.165",
     "@fontsource/inter": "^5.2.8",
     "@sparticuz/chromium": "^149.0.0",
     "playwright": "^1.49.0",
-    "playwright-core": "^1.60.0"
+    "playwright-core": "^1.60.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

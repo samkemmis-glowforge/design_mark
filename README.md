@@ -62,9 +62,9 @@ Built **one phase at a time**, top to bottom. Later phases depend on earlier art
 
 - [x] **Phase 0** — Brand spec (`brand/brand.json`, `brand/brand.md`) — Glowforge color system locked in
 - [x] **Phase 1** — Template renderer MVP (CLI) — feature-section → PNG via Playwright
-- [ ] **Phase 2** — Agent core (Claude Agent SDK, local CLI)
+- [x] **Phase 2** — Agent core (Claude Agent SDK, local CLI) — creative-director persona, routes briefs, asks before guessing
 - [ ] **Phase 3** — Slack integration (Bolt + Socket Mode)
-- [ ] **Phase 4** — Image generation tool
+- [ ] **Phase 4** — Image generation tool *(Canva Magic Media + stock as a provider)*
 - [ ] **Phase 5** — SVG/code path for branded graphics
 - [ ] **Phase 6** — Iteration & polish
 
@@ -83,6 +83,22 @@ npm run render -- --template feature-section \
 
 Themes: `light` (default), `cream`, `teal`, `ink`. Pass `--image path.png` to fill
 the image slot; otherwise a branded placeholder is rendered.
+
+## Running the agent (Phase 2)
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...     # required for the agent to run
+npm run agent -- "feature section announcing the layer tool"
+```
+
+The agent loads the brand spec, classifies the brief into a production route
+(layout template / SVG-code / image), asks clarifying questions in the terminal
+when the brief is thin (it won't guess required copy, channel, or dimensions),
+pulls references, then renders. Set `AGENT_MODEL` to override the model.
+
+The agent core is host-agnostic: `agent/design-server.ts` takes injectable
+`askHuman` / `onAsset` transports, so Phase 3 swaps the terminal for a Slack thread
+without touching the agent logic.
 
 ### Rendering notes
 - Chromium is sourced from npm (`@sparticuz/chromium`) and driven by `playwright-core`,

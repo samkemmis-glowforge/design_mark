@@ -1,0 +1,117 @@
+import { z } from "zod";
+import { createSdkMcpServer, tool } from "@anthropic-ai/claude-agent-sdk";
+import { renderTemplate } from "./tools/render-template.js";
+import { fetchReferences, type ReferenceKind } from "./tools/fetch-references.js";
+import { listTemplates } from "../templates/index.js";
+
+/**
+ * Transports that differ between the CLI (Phase 2) and Slack (Phase 3) hosts.
+ * The agent core stays identical; only how we ask the human and how we deliver
+ * a finished asset changes.
+ */
+export interface DesignHostTransports {
+  /** Ask the art director a clarifying question and resolve with their answer. */
+  askHuman: (question: string, options?: string[]) => Promise<string>;
+  /** Surface a finished asset (print path in CLI; upload to thread in Slack). */
+  onAsset: (info: { path: string; width: number; height: number }) => Promise<void>;
+}
+
+function text(s: string) {
+  return { content: [{ type: "text" as const, text: s }] };
+}
+
+export const DESIGN_SERVER_NAME = "design";
+
+export const DESIGN_TOOL_NAMES = [
+  "mcp__design__render_template",
+  "mcp__design__fetch_references",
+  "mcp__design__ask_human",
+];
+
+export function buildDesignServer(transports: DesignHostTransports) {
+  const renderTemplateTool = tool(
+    "render_template",
+    "Render a repeatable layout asset (feature section, etc.) from a brand template to PNG. " +
+      "Refuses to render if a required field is missing — ask the human instead of guessing. " +
+      "Available templates: " +
+      listTemplates()
+        .map((t) => `${t.name} (required: ${t.requiredFields.join(", ")})`)
+        .join("; "),
+    {
+      template: z.string().describe("Template id, e.g. 'feature-section'"),
+      eyebrow: z.string().optional().describe("Small kicker/label above the headline"),
+      headline: z.string().optional().describe("Main headline (required by feature-section)"),
+      body: z.string().optional().describe("Supporting body copy (required by feature-section)"),
+      cta: z.string().optional().describe("Call-to-action button label"),
+      theme: z
+        .enum(["light", "cream", "teal", "ink"])
+        .optional()
+        .describe("Color theme; defaults to light"),
+      imagePath: z
+        .string()
+        .optional()
+        .describe("Path to a real image/screenshot for the image slot; omit for a branded placeholder"),
+      width: z.number().optional().describe("Override output width in px"),
+      height: z.number().optional().describe("Override output height in px"),
+      outPath: z.string().optional().describe("Output PNG path; auto-named under output/ if omitted"),
+    },
+    async (args) => {
+      const content: Record<string, unknown> = {};
+      for (const k of ["eyebrow", "headline", "body", "cta", "theme"] as const) {
+        if (args[k] !== undefined) content[k] = args[k];
+      }
+      try {
+        const result = await renderTemplate({
+          template: args.template,
+          content,
+          imagePath: args.imagePath,
+          outPath: args.outPath,
+          width: args.width,
+          height: args.height,
+        });
+        await transports.onAsset({ path: result.outPath, width: result.width, height: result.height });
+        return text(
+          `Rendered ${args.template} → ${result.outPath} (${result.width}×${result.height}, ${(
+            result.bytes / 1024
+          ).toFixed(0)} KB). Shown to the art director; invite critique.`,
+        );
+      } catch (err) {
+        return text(`RENDER FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
+  const fetchReferencesTool = tool(
+    "fetch_references",
+    "List relevant brand references (swipe file) and exemplars (approved past work) to condition production.",
+    {
+      kind: z
+        .enum(["references", "exemplars", "all"])
+        .optional()
+        .describe("Which library to pull; defaults to all"),
+    },
+    async (args) => {
+      const result = await fetchReferences((args.kind ?? "all") as ReferenceKind);
+      return text(JSON.stringify(result, null, 2));
+    },
+  );
+
+  const askHumanTool = tool(
+    "ask_human",
+    "Ask the art director a clarifying question and wait for their answer. Use this before producing when the brief is missing required details.",
+    {
+      question: z.string().describe("The clarifying question to ask"),
+      options: z.array(z.string()).optional().describe("Optional suggested answers"),
+    },
+    async (args) => {
+      const answer = await transports.askHuman(args.question, args.options);
+      return text(answer);
+    },
+  );
+
+  return createSdkMcpServer({
+    name: DESIGN_SERVER_NAME,
+    version: "0.1.0",
+    tools: [renderTemplateTool, fetchReferencesTool, askHumanTool],
+  });
+}
