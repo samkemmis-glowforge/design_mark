@@ -13,7 +13,10 @@ import { pngSize } from "../../util/png-size.js";
  *
  * Env:
  *   GEMINI_API_KEY (or GOOGLE_API_KEY)   — required to run
- *   GEMINI_IMAGE_MODEL                   — default "gemini-2.5-flash-image"
+ *   GEMINI_IMAGE_MODEL                   — default "gemini-3-pro-image" (catalog-grade
+ *                                          quality; ~$0.13/image at 1K-2K). Set to
+ *                                          "gemini-2.5-flash-image" for a cheaper/faster
+ *                                          fallback (~$0.04/image).
  */
 
 const MIME: Record<string, string> = {
@@ -63,7 +66,7 @@ export const geminiProvider: ImageProvider = {
     if (!key) {
       throw new Error("GEMINI_API_KEY (or GOOGLE_API_KEY) is not set; cannot use the gemini image provider.");
     }
-    const model = process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image";
+    const model = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3-pro-image";
     const aspectRatio = req.aspectRatio ?? "1:1";
 
     const body = buildGeminiRequest(req.prompt, aspectRatio, await refsToParts(req.references));

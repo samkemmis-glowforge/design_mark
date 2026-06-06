@@ -137,9 +137,15 @@ selected by the `IMAGE_PROVIDER` env var:
   passes brand references as input parts to keep the look on-brand. To use it:
   ```bash
   export IMAGE_PROVIDER=gemini
-  export GEMINI_API_KEY=...                       # or GOOGLE_API_KEY
-  export GEMINI_IMAGE_MODEL=gemini-2.5-flash-image # optional; default shown
+  export GEMINI_API_KEY=...                     # or GOOGLE_API_KEY
+  export GEMINI_IMAGE_MODEL=gemini-3-pro-image  # optional; default shown
   ```
+  Model trade-off (per image, 1K–2K output):
+  - `gemini-3-pro-image` (**default**) — catalog-grade quality, ~$0.13/image.
+  - `gemini-2.5-flash-image` — cheaper/faster fallback, ~$0.04/image.
+
+  Note: image generation requires a **billing-enabled** Google project — the free
+  tier allows zero image requests (returns `429 RESOURCE_EXHAUSTED`, `limit: 0`).
 
 Add another backend (OpenAI, Flux, …) by implementing one `ImageProvider.generate()`
 method and registering it in `PROVIDERS`.
