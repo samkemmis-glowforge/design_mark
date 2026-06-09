@@ -77,46 +77,12 @@ function confetti(): string {
   </svg>`;
 }
 
-// The 90s "villain": a tilted floppy disk, struck through. Drawn in SVG so it
-// stays crisp and on-palette.
-function floppy(): string {
-  return `
-  <div class="floppy">
-    <svg viewBox="0 0 240 240" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-      <!-- starburst halo -->
-      <g opacity="0.9">
-        ${Array.from({ length: 16 })
-          .map((_, i) => {
-            const a = (i * 360) / 16;
-            return `<rect x="118" y="6" width="4" height="34" rx="2" fill="${
-              i % 2 ? "#FFE677" : "#FFA399"
-            }" transform="rotate(${a} 120 120)"/>`;
-          })
-          .join("")}
-      </g>
-      <!-- disk body -->
-      <g transform="rotate(-8 120 120)">
-        <rect x="58" y="58" width="124" height="124" rx="10" fill="#202634" stroke="#16A0B0" stroke-width="4"/>
-        <!-- metal shutter -->
-        <rect x="92" y="58" width="56" height="46" fill="#5B6472"/>
-        <rect x="120" y="62" width="22" height="38" rx="2" fill="#2A3140"/>
-        <!-- cut corner -->
-        <polygon points="170,58 182,58 182,70" fill="#0E1117"/>
-        <!-- label -->
-        <rect x="74" y="116" width="92" height="56" rx="4" fill="#F9E7CB"/>
-        <rect x="82" y="126" width="76" height="7" rx="3.5" fill="#FFA399"/>
-        <rect x="82" y="140" width="64" height="6" rx="3" fill="#16A0B0"/>
-        <rect x="82" y="152" width="70" height="6" rx="3" fill="#821AAB"/>
-      </g>
-      <!-- no / circle-slash -->
-      <circle cx="120" cy="120" r="98" fill="none" stroke="#FF3B6B" stroke-width="12" opacity="0.92"/>
-      <line x1="52" y1="52" x2="188" y2="188" stroke="#FF3B6B" stroke-width="12" stroke-linecap="round" opacity="0.92"/>
-    </svg>
-  </div>`;
-}
-
 async function main() {
   const logo = await dataUri("brand/logo/logo-full-250.png", "image/png");
+  // Real GF Pro render (Drive: GF-Pro_Front_Top_Down_V002) run through
+  // scripts/retro-90s-filter.py --duotone sunset; checked in under assets/ so
+  // the banner rebuilds without Drive access or re-running the filter.
+  const machine = await dataUri("assets/campaign-90s/gf-pro-90s-sunset.png", "image/png");
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     :root{
@@ -155,8 +121,9 @@ async function main() {
       filter:blur(2px);
     }
     .confetti{position:absolute; inset:0; z-index:2; pointer-events:none}
-    .floppy{position:absolute; right:34px; top:50%; transform:translateY(-50%); z-index:2;
-      filter:drop-shadow(0 14px 0 rgba(48,9,63,.45));}
+    .machine{position:absolute; right:-6px; top:50%; width:610px; z-index:3;
+      transform:translateY(-46%) rotate(-3deg);
+      filter:drop-shadow(0 18px 22px rgba(20,6,40,.45));}
 
     .logo-chip{
       position:absolute; top:30px; left:48px; z-index:3;
@@ -200,7 +167,7 @@ async function main() {
       <div class="horizon"></div>
       <div class="grid"></div>
       ${confetti()}
-      ${floppy()}
+      <img class="machine" src="${machine}" alt="Glowforge Pro, '90s edition"/>
       <div class="logo-chip"><img src="${logo}" alt="Glowforge"/></div>
       <div class="content">
         <div class="eyebrow">◆ System upgrade available ◆</div>
