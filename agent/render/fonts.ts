@@ -19,6 +19,8 @@ const FONT_FILES: Record<string, FontFile[]> = {
     { weight: 500, pkgPath: "@fontsource/inter/files/inter-latin-500-normal.woff2" },
     { weight: 600, pkgPath: "@fontsource/inter/files/inter-latin-600-normal.woff2" },
     { weight: 700, pkgPath: "@fontsource/inter/files/inter-latin-700-normal.woff2" },
+    { weight: 800, pkgPath: "@fontsource/inter/files/inter-latin-800-normal.woff2" },
+    { weight: 900, pkgPath: "@fontsource/inter/files/inter-latin-900-normal.woff2" },
   ],
 };
 
