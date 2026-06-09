@@ -15,6 +15,8 @@ export interface RenderSvgInput {
   width?: number;
   height?: number;
   outPath?: string;
+  /** Keep the PNG background transparent (for layer/sticker exports). */
+  omitBackground?: boolean;
 }
 
 function looksLikeSvg(markup: string): boolean {
@@ -57,5 +59,5 @@ export async function renderSvg(input: RenderSvgInput): Promise<HtmlToPngResult>
   }
 
   const outPath = input.outPath ?? `output/graphic-${Date.now()}.png`;
-  return htmlToPng({ html, width, height, outPath });
+  return htmlToPng({ html, width, height, outPath, omitBackground: input.omitBackground });
 }

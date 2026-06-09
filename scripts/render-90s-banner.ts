@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { renderSvg } from "../agent/tools/render-svg.js";
 import { REPO_ROOT } from "../agent/brand.js";
 
@@ -12,24 +13,23 @@ import { REPO_ROOT } from "../agent/brand.js";
  *
  * The right side is a cult-'90s-software collage (Win95 window, floppy, CD-ROM,
  * "Under Construction", error dialog, arrow + hourglass cursors) with a small,
- * retro-treated real GF Pro tucked into the pile — so the hardware shares focus
- * with the software-nostalgia gags rather than dominating.
+ * retro-treated real GF Pro tucked in. Parts are exported so the layer-exporter
+ * (scripts/export-90s-layers.ts) can render each element on its own.
  *
  * Palette (brand.json): teal #16A0B0, purple #821AAB, coral #FFA399,
  * yellow #FFE677, cobalt #001195, cream #F9E7CB, ink #12151A.
  */
 
-const W = 1200;
-const H = 600;
+export const W = 1200;
+export const H = 600;
 
-async function dataUri(relPath: string, mime: string): Promise<string> {
+export async function dataUri(relPath: string, mime: string): Promise<string> {
   const b64 = (await readFile(resolve(REPO_ROOT, relPath))).toString("base64");
   return `data:${mime};base64,${b64}`;
 }
 
-// Memphis/Lisa-Frank confetti — kept to the left/top now that the right side
-// holds the software collage.
-function confetti(): string {
+// Memphis/Lisa-Frank confetti — kept to the left/top, away from the collage.
+export function confetti(): string {
   const sparkle = (x: number, y: number, s: number, fill: string) =>
     `<use href="#spk" transform="translate(${x} ${y}) scale(${s})" fill="${fill}"/>`;
   const dot = (x: number, y: number, r: number, fill: string) =>
@@ -146,28 +146,50 @@ const HOURGLASS = `
   <path d="M17,26 L23,34 L11,34 Z" fill="#821AAB"/>
 </svg>`;
 
+export interface StickerDef {
+  name: string;
+  svg: string;
+  w: number;
+  h: number;
+  x: number;
+  y: number;
+  rot: number;
+  z: number;
+}
+
+/** Each '90s-software sticker plus its default placement in the banner. */
+export const STICKERS: StickerDef[] = [
+  { name: "win95-window", svg: WIN95, w: 222, h: 142, x: 646, y: 54, rot: -2, z: 4 },
+  { name: "cd-rom", svg: CDROM, w: 90, h: 90, x: 1090, y: 58, rot: 6, z: 4 },
+  { name: "floppy", svg: FLOPPY, w: 92, h: 92, x: 992, y: 122, rot: 9, z: 5 },
+  { name: "under-construction", svg: CONSTRUCTION, w: 156, h: 70, x: 640, y: 250, rot: 3, z: 4 },
+  { name: "error-dialog", svg: ERRORBOX, w: 170, h: 106, x: 650, y: 372, rot: -3, z: 5 },
+  { name: "cursor-arrow", svg: ARROW, w: 28, h: 40, x: 902, y: 246, rot: 0, z: 6 },
+  { name: "cursor-hourglass", svg: HOURGLASS, w: 34, h: 46, x: 1116, y: 312, rot: 9, z: 6 },
+];
+
 const place = (inner: string, x: number, y: number, rot = 0, z = 4): string =>
   `<div class="sticker" style="left:${x}px;top:${y}px;transform:rotate(${rot}deg);z-index:${z}">${inner}</div>`;
 
 function software(): string {
-  return [
-    place(WIN95, 646, 54, -2, 4),
-    place(CDROM, 1090, 58, 6, 4),
-    place(FLOPPY, 992, 122, 9, 5),
-    place(CONSTRUCTION, 640, 250, 3, 4),
-    place(ERRORBOX, 650, 372, -3, 5),
-    place(ARROW, 902, 246, 0, 6),
-    place(HOURGLASS, 1116, 312, 9, 6),
-  ].join("");
+  return STICKERS.map((s) => place(s.svg, s.x, s.y, s.rot, s.z)).join("");
 }
 
-async function main() {
-  const logo = await dataUri("brand/logo/logo-full-250.png", "image/png");
-  // Real GF Pro render (Drive: GF-Pro_Front_Top_Down_V002) run through
-  // scripts/retro-90s-filter.py --duotone sunset; checked in under assets/.
-  const machine = await dataUri("assets/campaign-90s/gf-pro-90s-sunset.png", "image/png");
+export interface StageOpts {
+  logoUri: string;
+  machineUri: string;
+  /** Include the right-side software collage. Off when exporting layers. */
+  stickers?: boolean;
+  /** Include the retro machine. Off when exporting layers. */
+  machine?: boolean;
+}
 
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+/** Build the full banner document. Toggles let the layer-exporter omit the
+ *  movable pieces so the backdrop can be rendered on its own. */
+export function buildStageHtml(opts: StageOpts): string {
+  const stickers = opts.stickers ?? true;
+  const machine = opts.machine ?? true;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>
     :root{
       --teal:#16A0B0; --tealTint:#C9EDF2; --purple:#821AAB; --coral:#FFA399;
       --yellow:#FFE677; --cobalt:#001195; --cream:#F9E7CB; --ink:#12151A;
@@ -250,9 +272,9 @@ async function main() {
       <div class="horizon"></div>
       <div class="grid"></div>
       ${confetti()}
-      <img class="machine" src="${machine}" alt="Glowforge Pro, '90s edition"/>
-      ${software()}
-      <div class="logo-chip"><img src="${logo}" alt="Glowforge"/></div>
+      ${machine ? `<img class="machine" src="${opts.machineUri}" alt="Glowforge Pro, '90s edition"/>` : ""}
+      ${stickers ? software() : ""}
+      <div class="logo-chip"><img src="${opts.logoUri}" alt="Glowforge"/></div>
       <div class="content">
         <div class="eyebrow">◆ System upgrade available ◆</div>
         <h1 class="headline">Is your laser software<br><span class="hl">stuck in the '90s?</span></h1>
@@ -261,18 +283,29 @@ async function main() {
       </div>
     </div>
   </body></html>`;
+}
 
+export const MACHINE_ASSET = "assets/campaign-90s/gf-pro-90s-sunset.png";
+
+async function main() {
+  const logoUri = await dataUri("brand/logo/logo-full-250.png", "image/png");
+  const machineUri = await dataUri(MACHINE_ASSET, "image/png");
   const out = await renderSvg({
-    markup: html,
+    markup: buildStageHtml({ logoUri, machineUri }),
     width: W,
     height: H,
     outPath: "output/email-banner-90s.png",
   });
   console.log(`✓ ${out.outPath} (${out.width}×${out.height}, ${(out.bytes / 1024) | 0} KB)`);
-  process.exit(0);
 }
 
-main().catch((e) => {
-  console.error("✗", e);
-  process.exit(1);
-});
+// Only render when run directly (so the layer-exporter can import the parts).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().then(
+    () => process.exit(0),
+    (e) => {
+      console.error("✗", e);
+      process.exit(1);
+    },
+  );
+}

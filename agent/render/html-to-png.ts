@@ -15,6 +15,8 @@ export interface HtmlToPngOptions {
   deviceScaleFactor?: number;
   /** If true, capture the full scrollable page instead of a fixed viewport. */
   fullPage?: boolean;
+  /** If true, keep the PNG background transparent (for layer/sticker exports). */
+  omitBackground?: boolean;
 }
 
 export interface HtmlToPngResult {
@@ -29,7 +31,7 @@ export interface HtmlToPngResult {
  * Shared by the template path (Phase 1) and the agent-authored SVG/HTML path (Phase 5).
  */
 export async function htmlToPng(opts: HtmlToPngOptions): Promise<HtmlToPngResult> {
-  const { html, width, height, deviceScaleFactor = 2, fullPage = false } = opts;
+  const { html, width, height, deviceScaleFactor = 2, fullPage = false, omitBackground = false } = opts;
   const outPath = isAbsolute(opts.outPath) ? opts.outPath : resolve(REPO_ROOT, opts.outPath);
 
   const browser = await launchBrowser();
@@ -46,7 +48,7 @@ export async function htmlToPng(opts: HtmlToPngOptions): Promise<HtmlToPngResult
       if (document.fonts?.ready) await document.fonts.ready;
     });
     await mkdir(dirname(outPath), { recursive: true });
-    const buffer = await page.screenshot({ type: "png", fullPage });
+    const buffer = await page.screenshot({ type: "png", fullPage, omitBackground });
     await writeFile(outPath, buffer);
     return { outPath, width, height, bytes: buffer.length };
   } finally {
