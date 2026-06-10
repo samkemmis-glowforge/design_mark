@@ -7,10 +7,10 @@ import { REPO_ROOT } from "../agent/brand.js";
  * "Magic Engraver" product-page banner — 3-step strip: photo → engraving →
  * leather keepsake tag, with the "1. Just  2. Make  3. Stuff" tagline.
  *
- * STATUS: layout scaffold. Panels 1 & 2 use placeholders until Milo's real
- * photo + engraving are pulled from Drive; the panel-3 tag is code-drawn (the
- * real engraving + "Milo" composite drops into the tag face). Clean Glowforge
- * brand styling (teal/cream/ink + Inter), not the '90s treatment.
+ * Uses Milo's real assets (Drive): milo-photo.jpg + milo-engraved.svg (a vector
+ * woodcut). The engraving is shown as-is in panel 2 and recolored to a burnt
+ * tone composited onto the tag face in panel 3. Clean Glowforge brand styling
+ * (teal/cream/ink + Inter), not the '90s treatment.
  */
 
 const W = 1600;
@@ -21,27 +21,13 @@ async function dataUri(relPath: string, mime: string): Promise<string> {
   return `data:${mime};base64,${b64}`;
 }
 
-// Placeholder art for panels still awaiting real assets.
-function placeholder(caption: string, glyph: string): string {
-  return `
-  <div class="ph">
-    <div class="ph-glyph">${glyph}</div>
-    <div class="ph-cap">${caption}</div>
-    <div class="ph-note">your image here</div>
-  </div>`;
-}
+const stripMM = (s: string): string =>
+  s.replace(/\swidth="[^"]*mm"/i, "").replace(/\sheight="[^"]*mm"/i, "");
 
-const CAMERA = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#16A0B0" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
-  <rect x="6" y="16" width="52" height="38" rx="6"/><path d="M22 16 l4-6 h12 l4 6"/><circle cx="32" cy="35" r="11"/></svg>`;
-
-const ENGRAVE = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#16A0B0" stroke-width="3.5" stroke-linecap="round">
-  <path d="M10 46 L40 16 a6 6 0 0 1 8 8 L26 46 Z"/><path d="M10 46 l-3 9 l9 -3"/><path d="M40 16 l8 8"/></svg>`;
-
-// Classic rounded leather dog tag with a split ring, stitching, a paw-print
-// engraving stand-in, and "MILO". The real dog engraving composites onto the
-// tag face in the same spot.
-const TAG = `
-<svg width="230" height="280" viewBox="0 0 230 280" xmlns="http://www.w3.org/2000/svg">
+// Classic rounded leather dog tag (split ring, stitching) WITHOUT the engraving
+// or name — those overlay as HTML so the real vector + crisp text sit on top.
+const TAG_BASE = `
+<svg width="250" height="304" viewBox="0 0 230 280" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="leather" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#8a513c"/><stop offset="1" stop-color="#5a2f22"/></linearGradient>
@@ -54,18 +40,6 @@ const TAG = `
   <rect x="28" y="44" width="174" height="210" rx="28" fill="url(#sheen)"/>
   <circle cx="115" cy="66" r="10" fill="#2a130b"/><circle cx="115" cy="66" r="10" fill="none" stroke="#a4674c" stroke-width="1.5"/>
   <rect x="41" y="58" width="148" height="182" rx="19" fill="none" stroke="#F1DCC0" stroke-width="2.5" stroke-dasharray="7 6"/>
-  <!-- paw-print engraving stand-in (debossed look) -->
-  <g transform="translate(115 132)" fill="#34180e">
-    <ellipse cx="0" cy="12" rx="20" ry="16"/>
-    <ellipse cx="-20" cy="-8" rx="7" ry="10"/>
-    <ellipse cx="-7" cy="-17" rx="7" ry="10"/>
-    <ellipse cx="7" cy="-17" rx="7" ry="10"/>
-    <ellipse cx="20" cy="-8" rx="7" ry="10"/>
-  </g>
-  <g transform="translate(115 132)" fill="#a4674c" opacity="0.5">
-    <ellipse cx="-1.5" cy="10.5" rx="20" ry="16"/></g>
-  <text x="115" y="226" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="30" letter-spacing="3" fill="#2a130b">MILO</text>
-  <text x="113.5" y="224.5" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="30" letter-spacing="3" fill="#b07a5e" opacity="0.5">MILO</text>
 </svg>`;
 
 const ARROW = `<svg width="46" height="40" viewBox="0 0 46 40" fill="none" stroke="#16A0B0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
@@ -81,6 +55,10 @@ function panel(num: string, word: string, inner: string): string {
 
 async function main() {
   const logo = await dataUri("brand/logo/logo-full-250.png", "image/png");
+  const photo = await dataUri("assets/magic-engraver/milo-photo.jpg", "image/jpeg");
+  const engRaw = stripMM(await readFile(resolve(REPO_ROOT, "assets/magic-engraver/milo-engraved.svg"), "utf8"));
+  const engBlack = engRaw; // panel 2: the woodcut as-is
+  const engBurnt = engRaw.replaceAll("#000000", "#26110a"); // panel 3: burned into leather
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     :root{--teal:#16A0B0;--tealTint:#C9EDF2;--cream:#F9E7CB;--creamTint:#FDF8F1;--ink:#12151A;--coral:#FFA399;}
@@ -94,9 +72,16 @@ async function main() {
     .card{width:430px}
     .imgbox{width:430px;height:322px;border-radius:20px;overflow:hidden;background:var(--creamTint);
       border:3px solid var(--teal);display:flex;align-items:center;justify-content:center;position:relative}
-    .ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:#7a8a8c}
-    .ph-cap{font-weight:800;font-size:20px;color:var(--ink)}
-    .ph-note{font-size:13px;letter-spacing:.04em;color:#9aa6a7}
+    .photo img{width:100%;height:100%;object-fit:cover;object-position:center 32%;display:block}
+    .engrave svg{max-width:100%;max-height:100%;display:block}
+    .tag-wrap{position:relative;width:250px;height:304px}
+    .tag-wrap>svg{display:block;width:250px;height:304px}
+    .tag-engrave{position:absolute;top:62px;left:53px;width:144px;height:144px;overflow:hidden;opacity:.93}
+    .tag-engrave svg{width:100%;height:100%;display:block;fill:#26110a}
+    .tag-engrave svg path{fill:#26110a}
+    .tag-name{position:absolute;top:226px;left:0;width:250px;text-align:center;
+      font-weight:900;font-size:30px;letter-spacing:3px;color:#26110a;
+      text-shadow:0 1px 0 rgba(214,170,140,.6)}
     .label{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:22px}
     .badge{width:42px;height:42px;border-radius:999px;background:var(--teal);color:#fff;font-weight:900;font-size:22px;
       display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 var(--coral)}
@@ -109,11 +94,11 @@ async function main() {
         <img src="${logo}" alt="Glowforge"/>
       </div>
       <div class="row">
-        ${panel("1", "Just", placeholder("Dog photo", CAMERA))}
+        ${panel("1", "Just", `<div class="photo" style="width:100%;height:100%"><img src="${photo}" alt="Milo"/></div>`)}
         <div class="arrow">${ARROW}</div>
-        ${panel("2", "Make", placeholder("Engraving", ENGRAVE))}
+        ${panel("2", "Make", `<div class="engrave" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box">${engBlack}</div>`)}
         <div class="arrow">${ARROW}</div>
-        ${panel("3", "Stuff", TAG)}
+        ${panel("3", "Stuff", `<div class="tag-wrap">${TAG_BASE}<div class="tag-engrave">${engBurnt}</div><div class="tag-name">MILO</div></div>`)}
       </div>
     </div>
   </body></html>`;
