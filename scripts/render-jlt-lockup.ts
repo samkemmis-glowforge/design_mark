@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { renderSvg } from "../agent/tools/render-svg.js";
+import { coverCrop, cropCss, overlayOnSubject, makeGrid, type ImageInfo } from "../agent/render/layout.js";
 import { REPO_ROOT } from "../agent/brand.js";
 
 /**
@@ -8,16 +9,17 @@ import { REPO_ROOT } from "../agent/brand.js";
  *
  * Left two-thirds: a single typographic lockup — three giant lines, flush
  * left, tight pitch; each step image is a circle set INLINE in its line at
- * cap height (word↔step pairing lives inside the typesetting, no scatter,
- * no orphan whitespace). Tagline closes the block on the same margin.
+ * cap height (word↔step pairing lives inside the typesetting). Right third:
+ * full-height product panel with the engraving large. No CTA/logo (landing
+ * page header carries both).
  *
- * Right third: full-height product panel — the lifestyle coaster scene with
- * the engraving BIG and the Pacifico name readable. One focal point; the
- * lockup reads down, the eye lands on the payoff. No CTA.
+ * Crops are computed from recorded subject boxes (subjects.json, visually
+ * verified) via coverCrop — subjects are centered by construction.
  */
 
 const W = 1920;
 const H = 1080;
+const grid = makeGrid({ width: W, height: H });
 
 async function dataUri(absOrRel: string, mime: string): Promise<string> {
   const p = absOrRel.startsWith("/") ? absOrRel : resolve(REPO_ROOT, absOrRel);
@@ -25,8 +27,6 @@ async function dataUri(absOrRel: string, mime: string): Promise<string> {
 }
 
 async function main() {
-  // landing page header carries the logo
-  // const logo = await dataUri("brand/logo/logo-full-250.png", "image/png");
   const photo = await dataUri("assets/magic-engraver/milo2.jpg", "image/jpeg");
   const engraving = await dataUri("assets/magic-engraver/milo-engrave2.png", "image/png");
   const burnt = await dataUri("/tmp/milo/engrave2-burnt.png", "image/png");
@@ -35,15 +35,26 @@ async function main() {
     await readFile(resolve(REPO_ROOT, "node_modules/@fontsource/pacifico/files/pacifico-latin-400-normal.woff2"))
   ).toString("base64");
 
-  // Right panel: scene scaled so the coaster face is the hero (~494px dia).
-  const panelW = 680;
-  const ps = 1150 / 1024;
-  const panelLeft = panelW / 2 - 497 * ps;
-  const panelTop = H / 2 - 527 * ps;
+  const subjects = JSON.parse(
+    await readFile(resolve(REPO_ROOT, "assets/magic-engraver/subjects.json"), "utf8"),
+  ) as Record<string, ImageInfo>;
+  const sPhoto = subjects["milo2.jpg"];
+  const sEng = subjects["milo-engrave2.png"];
+  const sScene = subjects["coaster-scene.png"];
+  const ENG_ASPECT = sEng.h / sEng.w;
 
-  // Inline coaster circle: face fills the 220px circle.
-  const cs = 0.52;
+  // Inline step circles: subject centered, face filling ~85% of the circle.
   const D = 220;
+  const dotPhoto = coverCrop(sPhoto, { w: D, h: D }, 0.85);
+  const dotEng = coverCrop(sEng, { w: D, h: D }, 0.85);
+  const dotScene = coverCrop(sScene, { w: D, h: D }, 0.97);
+  const dotBurnt = overlayOnSubject(dotScene, ENG_ASPECT, 0.58, -0.05);
+
+  // Product panel: coaster face centered, ~72% of panel width.
+  const panelW = 680;
+  const panel = coverCrop(sScene, { w: panelW, h: H }, 0.72);
+  const panelBurnt = overlayOnSubject(panel, ENG_ASPECT, 0.58, -0.06);
+  const nameTop = panel.subjectCenter.y + 0.30 * panel.subjectSize.h;
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     @font-face{font-family:'Pacifico';src:url(data:font/woff2;base64,${pacifico}) format('woff2')}
@@ -53,52 +64,46 @@ async function main() {
       font-family:'Inter',sans-serif;overflow:hidden}
 
     /* ---- the lockup ---- */
-    .line{position:absolute;left:84px;display:flex;align-items:center;gap:46px}
+    .line{position:absolute;left:${grid.margin}px;display:flex;align-items:center;gap:46px}
     .w{font-weight:900;font-size:240px;letter-spacing:-0.045em;color:var(--ink);
       white-space:nowrap;line-height:1}
     .w.outline{color:transparent;-webkit-text-stroke:5px var(--ink)}
     .dot{width:${D}px;height:${D}px;border-radius:50%;overflow:hidden;
       border:5px solid var(--ink);position:relative;flex:none;background:#fff}
-    .dot img{display:block}
 
-    .tagline{position:absolute;left:84px;top:962px;font-weight:600;font-size:27px;
-      color:var(--ink);letter-spacing:-0.01em}
+    .tagline{position:absolute;left:${grid.margin}px;top:962px;font-weight:600;
+      font-size:27px;color:var(--ink);letter-spacing:-0.01em}
 
     /* ---- product panel ---- */
     .panel{position:absolute;right:0;top:0;width:${panelW}px;height:${H}px;overflow:hidden}
-    .panel .scene{position:absolute;left:${panelLeft}px;top:${panelTop}px;height:1150px}
-    .panel .eng{position:absolute;left:${panelW / 2 - 152}px;top:${H / 2 - 218}px;width:304px;
-      mix-blend-mode:multiply;opacity:0.9}
-    .panel .nm{position:absolute;left:0;right:0;top:${H / 2 + 168}px;text-align:center;
+    .panel .eng{mix-blend-mode:multiply;opacity:0.9}
+    .panel .nm{position:absolute;left:0;right:0;top:${nameTop.toFixed(0)}px;text-align:center;
       font-family:'Pacifico';font-size:58px;color:#2a1408;mix-blend-mode:multiply;opacity:0.92}
 
-    .eyebrow{position:absolute;z-index:5;top:56px;left:84px;font-weight:800;
+    .eyebrow{position:absolute;z-index:5;top:56px;left:${grid.margin}px;font-weight:800;
       font-size:21px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ink)}
-    .logo{position:absolute;z-index:5;top:48px;right:60px}
-    .logo img{height:40px;display:block;filter:brightness(0) invert(1);
-      opacity:0.95}
     .arrow{position:absolute;z-index:4}
   </style></head><body>
     <div class="stage">
       <div class="panel">
-        <img class="scene" src="${scene}"/>
-        <img class="eng" src="${burnt}"/>
+        <img src="${scene}" style="${cropCss(panel)}"/>
+        <img class="eng" src="${burnt}" style="position:absolute;left:${panelBurnt.left.toFixed(0)}px;top:${panelBurnt.top.toFixed(0)}px;width:${panelBurnt.width.toFixed(0)}px"/>
         <div class="nm">Milo</div>
       </div>
 
       <div class="line" style="top:150px">
         <span class="w">JUST</span>
-        <span class="dot"><img src="${photo}" style="width:150%;height:150%;object-fit:cover;object-position:center 8%;margin:-8% 0 0 -25%"/></span>
+        <span class="dot"><img src="${photo}" style="${cropCss(dotPhoto)}"/></span>
       </div>
       <div class="line" style="top:420px">
         <span class="w outline">LIKE</span>
-        <span class="dot"><img src="${engraving}" style="width:364px;margin:-10px 0 0 -72px"/></span>
+        <span class="dot"><img src="${engraving}" style="${cropCss(dotEng)}"/></span>
       </div>
       <div class="line" style="top:690px">
         <span class="w">THAT</span>
         <span class="dot">
-          <img src="${scene}" style="position:absolute;left:${D / 2 - 497 * cs}px;top:${D / 2 - 527 * cs}px;height:${1024 * cs}px"/>
-          <img src="${burnt}" style="position:absolute;left:${D / 2 - 64}px;top:${D / 2 - 92}px;width:128px;mix-blend-mode:multiply;opacity:0.9"/>
+          <img src="${scene}" style="${cropCss(dotScene)}"/>
+          <img src="${burnt}" style="position:absolute;left:${dotBurnt.left.toFixed(0)}px;top:${dotBurnt.top.toFixed(0)}px;width:${dotBurnt.width.toFixed(0)}px;mix-blend-mode:multiply;opacity:0.9"/>
         </span>
       </div>
 
