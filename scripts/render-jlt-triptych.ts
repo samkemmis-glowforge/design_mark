@@ -28,6 +28,48 @@ async function dataUri(absOrRel: string, mime: string): Promise<string> {
   return `data:${mime};base64,${(await readFile(p)).toString("base64")}`;
 }
 
+/** Seeded PRNG (mulberry32) so the wobble is reproducible across renders. */
+function rng(seed: number): () => number {
+  return () => {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Hand-drawn vertical divider: a wavering ink stroke with a gentle lean,
+ * under a cream halo so it reads on white, teal, and wood alike. `cx` is the
+ * gutter x; `lean` is the top→bottom horizontal drift; `seed` varies the waver.
+ */
+function roughDivider(cx: number, lean: number, seed: number): string {
+  const r = rng(seed);
+  const steps = 9;
+  const pts: [number, number][] = [];
+  for (let i = 0; i <= steps; i++) {
+    const f = i / steps;
+    const y = f * H;
+    const waver = (r() - 0.5) * 11 + Math.sin(f * Math.PI * 1.7 + seed) * 4;
+    pts.push([cx + lean * (f - 0.5) + waver, y]);
+  }
+  // smooth Catmull-Rom → cubic bezier path
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? 0 : i - 1], p1 = pts[i], p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : pts.length - 1];
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return `<svg class="rule" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none"
+      stroke-linecap="round">
+      <path d="${d}" stroke="#F9E7CB" stroke-width="9" opacity="0.85"/>
+      <path d="${d}" stroke="#1C1813" stroke-width="3.4"/>
+      <path d="${d}" stroke="#1C1813" stroke-width="1.4" transform="translate(2.5,0)" opacity="0.4"/>
+    </svg>`;
+}
+
 async function main() {
   const photo = await dataUri("assets/magic-engraver/milo2.jpg", "image/jpeg");
   const dogTeal = await dataUri("/tmp/milo/m2-cut-teal.png", "image/png");
@@ -71,7 +113,7 @@ async function main() {
       font-family:'Inter',sans-serif;overflow:hidden}
     .p2{position:absolute;left:${P}px;top:0;width:${P}px;height:${H}px;background:var(--dark)}
     .p3{position:absolute;left:${2 * P}px;top:0;width:${P}px;height:${H}px;overflow:hidden}
-    .rule{position:absolute;top:0;bottom:0;width:3px;background:var(--ink);z-index:1;opacity:0.9}
+    .rule{position:absolute;left:0;top:0;z-index:4}
 
     .word{position:absolute;z-index:2;font-weight:900;font-size:250px;
       letter-spacing:-0.045em;white-space:nowrap;line-height:1}
@@ -100,8 +142,8 @@ async function main() {
         <img class="eng" src="${burnt}" style="left:${(faceCx - 2 * P - engW / 2).toFixed(0)}px;top:${motifTop.toFixed(0)}px;width:${engW.toFixed(0)}px"/>
         <div class="nm" style="left:${(faceCx - 2 * P - 150).toFixed(0)}px;top:${(motifTop + engH + nameGap).toFixed(0)}px;width:300px">Milo</div>
       </div>
-      <div class="rule" style="left:${P - 1}px"></div>
-      <div class="rule" style="left:${2 * P - 1}px"></div>
+      ${roughDivider(P, 22, 7)}
+      ${roughDivider(2 * P, -18, 23)}
 
       <div class="word" style="left:60px;top:100px;color:var(--ink)">JUST</div>
       <div class="word" style="left:680px;top:280px;color:var(--cream)">LIKE</div>
