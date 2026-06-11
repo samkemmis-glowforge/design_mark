@@ -48,13 +48,22 @@ async function main() {
   const dotPhoto = coverCrop(sPhoto, { w: D, h: D }, 0.85);
   const dotEng = coverCrop(sEng, { w: D, h: D }, 0.85);
   const dotScene = coverCrop(sScene, { w: D, h: D }, 0.97);
-  const dotBurnt = overlayOnSubject(dotScene, ENG_ASPECT, 0.58, -0.05);
+  const dotBurnt = overlayOnSubject(dotScene, ENG_ASPECT, 0.58, 0);
 
-  // Product panel: coaster face centered, ~72% of panel width.
+  // Product panel: coaster face centered, ~72% of panel width. The engraved
+  // dog + name are centered ON the face as one group.
   const panelW = 680;
   const panel = coverCrop(sScene, { w: panelW, h: H }, 0.72);
-  const panelBurnt = overlayOnSubject(panel, ENG_ASPECT, 0.58, -0.06);
-  const nameTop = panel.subjectCenter.y + 0.30 * panel.subjectSize.h;
+  const engW = panel.subjectSize.w * 0.58;
+  const engH = engW * ENG_ASPECT;
+  const nameH = 66, nameGap = 8;
+  const motifTop = panel.subjectCenter.y - (engH + nameGap + nameH) / 2;
+  const panelBurnt = {
+    width: engW, height: engH,
+    left: panel.subjectCenter.x - engW / 2,
+    top: motifTop,
+  };
+  const nameTop = motifTop + engH + nameGap;
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     @font-face{font-family:'Pacifico';src:url(data:font/woff2;base64,${pacifico}) format('woff2')}
@@ -119,7 +128,36 @@ async function main() {
   </body></html>`;
 
   const out = await renderSvg({ markup: html, width: W, height: H, outPath: "output/jlt-lockup.png" });
-  console.log(`✓ ${out.outPath} (${out.width}×${out.height}, ${(out.bytes / 1024) | 0} KB)`);
+
+  // Emit layout beliefs for scripts/design-check.py to verify against pixels.
+  const { writeFile } = await import("node:fs/promises");
+  const dot3x = 84 + 635 + 46; // THAT width + flex gap (measured)
+  const faceR = panel.subjectSize.w / 2;
+  await writeFile(
+    "output/jlt-lockup.checks.json",
+    JSON.stringify({
+      canvas: [W, H],
+      checks: [
+        {
+          name: "panel-coaster-motif",
+          region: [W - panelW, 0, panelW, H],
+          radius: [faceR * 0.8, faceR * 1.25],
+          expect_center: [W - panelW + panel.subjectCenter.x, panel.subjectCenter.y],
+          tol: 8,
+        },
+        {
+          // tol 8: the engraving's ink bbox is left-skewed by the tail, so
+          // allow ~12px bbox drift at this size (visually verified centered).
+          name: "dot3-coaster-motif",
+          region: [dot3x - 10, 690, D + 20, D + 20],
+          radius: [D * 0.42, D * 0.56],
+          expect_center: [dot3x + D / 2, 700 + D / 2],
+          tol: 8,
+        },
+      ],
+    }, null, 2),
+  );
+  console.log(`✓ ${out.outPath} (${out.width}×${out.height}, ${(out.bytes / 1024) | 0} KB) + checks.json`);
   process.exit(0);
 }
 
