@@ -4,18 +4,19 @@ import { renderSvg } from "../agent/tools/render-svg.js";
 import { REPO_ROOT } from "../agent/brand.js";
 
 /**
- * "Magic Engraver" product-page hero — concept: JUST LIKE THAT.
+ * "Magic Engraver" product-page hero — JUST LIKE THAT, the "big swing" layout
+ * (comp B, art-directed with Sam; studies live in scripts/render-hero-comps.ts).
  *
- * Type-led VOLDOG-style poster where the wordmark IS the process: three giant
- * stacked words, each one sitting beside its step —
- *   JUST  · the taped phone photo
- *   LIKE  · the woodcut Milo cut-out (layered over the type)
- *   THAT  · the finished artifact: a walnut plaque (Gemini-generated base,
- *           real vector engraving composited on so the linework stays crisp)
+ * Three giant words staircase down the canvas, each beside its step:
+ *   JUST (left)  · the taped phone photo
+ *   LIKE (right) · the woodcut Milo, hero-scale in the bottom-right corner
+ *   THAT (left)  · the engraved walnut plaque, tucked against Milo's chest
+ * Motion: a dashed teal swoosh from photo to engraving, comic "snap" ticks
+ * where the plaque just appeared, alternating doodles along the diagonal.
  *
- * Restraint: cream field + warm ink. Teal only on doodles, tape, arrows, CTA.
- * The photo chip is the single full-color element; the plaque the only photo-
- * real object.
+ * Restraint: cream field + warm ink; teal only on tape/swoosh/doodles/CTA;
+ * the photo chip is the single full-color element, the plaque the only
+ * photoreal object (Gemini walnut base + real vector engraving composited).
  */
 
 const W = 1920;
@@ -29,15 +30,6 @@ async function dataUri(relPath: string, mime: string): Promise<string> {
 const stripMM = (s: string): string =>
   s.replace(/\swidth="[^"]*mm"/i, "").replace(/\sheight="[^"]*mm"/i, "");
 
-// Hand-drawn teal arrow (points down-left; mirror with scaleX(-1) for down-right).
-const ARROW = `
-<svg width="220" height="190" viewBox="0 0 220 190" fill="none" stroke="#16A0B0"
-     stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M196 14 C 168 64, 132 108, 64 148 C 58 151, 50 156, 41 160"/>
-  <path d="M78 142 L 38 162 L 82 174"/>
-</svg>`;
-
-// Four-point hand-drawn sparkles (slightly irregular on purpose).
 const sparkle = (s: number, rot = 0) => `
 <svg width="${s}" height="${s}" viewBox="0 0 60 60" fill="none" stroke="#16A0B0"
      stroke-width="6" stroke-linecap="round" style="transform:rotate(${rot}deg)">
@@ -58,89 +50,76 @@ async function main() {
     html,body{margin:0;padding:0}
     .stage{position:relative;width:${W}px;height:${H}px;background:var(--cream);
       font-family:'Inter',sans-serif;overflow:hidden}
-
-    /* ---- giant three-line wordmark (behind the collage) ---- */
-    .wordmark{position:absolute;z-index:1;top:120px;left:84px}
-    .wordmark div{font-weight:900;font-size:300px;line-height:0.87;
-      letter-spacing:-0.045em;color:var(--ink);white-space:nowrap}
-
-    /* ---- step 2: Milo cut-out, over the type ---- */
-    .milo{position:absolute;z-index:3;left:820px;bottom:-14px;width:690px}
-    .milo img{display:block;width:100%;height:auto;
-      filter:drop-shadow(-14px 18px 0 rgba(28,24,19,0.18))}
-
-    /* ---- top furniture ---- */
-    .eyebrow{position:absolute;z-index:4;top:56px;left:84px;font-weight:800;
+    .word{position:absolute;z-index:1;font-weight:900;font-size:280px;
+      letter-spacing:-0.045em;color:var(--ink);white-space:nowrap;line-height:1}
+    .eyebrow{position:absolute;z-index:6;top:56px;left:84px;font-weight:800;
       font-size:21px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ink)}
-    .logo{position:absolute;z-index:4;top:48px;right:84px}
+    .logo{position:absolute;z-index:6;top:48px;right:84px}
     .logo img{height:40px;display:block}
-
-    /* ---- step 1: taped snapshot ---- */
-    .chip{position:absolute;z-index:5;top:110px;right:140px;width:236px;
-      transform:rotate(7deg);background:#fff;padding:10px 10px 14px;
-      box-shadow:-10px 14px 0 rgba(28,24,19,0.18)}
-    .chip img{display:block;width:100%;height:212px;object-fit:cover;object-position:center 30%}
-    .chip .cap{margin-top:9px;text-align:center;font-size:17px;font-style:italic;
-      font-weight:600;color:var(--ink);letter-spacing:0.01em}
-    .tape{position:absolute;width:104px;height:32px;background:rgba(22,160,176,0.55);
-      transform:rotate(-42deg);top:-12px;left:-32px}
-    .tape.b{left:auto;right:-32px;transform:rotate(42deg)}
-
-    /* ---- step 3: the engraved walnut plaque ---- */
-    .plaque{position:absolute;z-index:5;left:1330px;top:726px;width:500px;
-      transform:rotate(-5deg);filter:drop-shadow(-12px 14px 0 rgba(28,24,19,0.22))}
+    .chip{position:absolute;z-index:5;left:846px;top:86px;width:230px;
+      transform:rotate(6deg);background:#fff;padding:10px 10px 13px;
+      box-shadow:-9px 12px 0 rgba(28,24,19,0.18)}
+    .chip img{display:block;width:100%;height:206px;object-fit:cover;object-position:center 30%}
+    .chip .cap{margin-top:8px;text-align:center;font-size:16px;font-style:italic;
+      font-weight:600;color:var(--ink)}
+    .tape{position:absolute;width:100px;height:30px;background:rgba(22,160,176,0.55);
+      transform:rotate(-42deg);top:-11px;left:-30px}
+    .tape.b{left:auto;right:-30px;transform:rotate(42deg)}
+    .milo{position:absolute;z-index:3;left:1290px;bottom:-14px;width:600px}
+    .milo img{display:block;width:100%;height:auto;
+      filter:drop-shadow(-12px 14px 0 rgba(28,24,19,0.18))}
+    .plaque{position:absolute;z-index:5;left:880px;top:744px;width:460px;
+      transform:rotate(-5deg);filter:drop-shadow(-11px 12px 0 rgba(28,24,19,0.22))}
     .plaque>img{display:block;width:100%;height:auto}
     .plaque .eng{position:absolute;top:17%;left:6%;height:66%;aspect-ratio:1.036;
       mix-blend-mode:multiply;opacity:0.92}
     .plaque .eng svg{width:100%;height:100%;display:block}
     .plaque .nm{position:absolute;right:6%;top:50%;transform:translateY(-50%);
-      font-weight:900;font-size:56px;letter-spacing:0.05em;color:#2a1408;
+      font-weight:900;font-size:52px;letter-spacing:0.05em;color:#2a1408;
       mix-blend-mode:multiply;opacity:0.88}
-
-    .arrow{position:absolute;z-index:4}
-
-    /* ---- doodles ---- */
+    .swoosh{position:absolute;z-index:2;inset:0}
     .doodle{position:absolute;z-index:4}
-
-    /* ---- bottom copy + CTA ---- */
-    .copy{position:absolute;z-index:5;left:84px;bottom:34px;display:flex;
-      align-items:center;gap:30px}
-    .copy .line{font-weight:800;font-size:30px;color:var(--ink);letter-spacing:-0.01em}
-    .cta{display:inline-block;background:var(--teal);color:#fff;
-      font-weight:800;font-size:22px;letter-spacing:0.02em;padding:15px 30px;
-      border-radius:999px;box-shadow:-6px 8px 0 rgba(28,24,19,0.20)}
+    .tagline{position:absolute;z-index:6;right:84px;top:142px;font-weight:800;
+      font-size:26px;color:var(--ink);letter-spacing:-0.01em}
+    .cta{position:absolute;z-index:6;right:84px;top:200px;background:var(--teal);
+      color:#fff;font-weight:800;font-size:22px;letter-spacing:0.02em;
+      padding:15px 30px;border-radius:999px;box-shadow:-6px 8px 0 rgba(28,24,19,0.20)}
   </style></head><body>
     <div class="stage">
-      <div class="wordmark"><div>JUST</div><div>LIKE</div><div>THAT</div></div>
-
-      <div class="milo"><img src="${milo}" alt="Milo, engraved"/></div>
-
-      <div class="eyebrow">Magic Engraver</div>
-      <div class="logo"><img src="${logo}" alt="Glowforge"/></div>
-
+      <div class="word" style="left:84px;top:120px">JUST</div>
       <div class="chip">
         <span class="tape"></span><span class="tape b"></span>
         <img src="${photo}" alt="Milo's phone photo"/>
         <div class="cap">started as this phone pic</div>
       </div>
 
+      <div class="word" style="right:570px;top:400px">LIKE</div>
+      <div class="milo"><img src="${milo}" alt="Milo, engraved"/></div>
+
+      <div class="word" style="left:84px;top:756px">THAT</div>
       <div class="plaque">
         <img src="${plaque}" alt="Walnut plaque"/>
         <div class="eng">${engBurnt}</div>
         <div class="nm">MILO</div>
       </div>
 
-      <div class="arrow" style="top:330px;right:330px">${ARROW}</div>
-      <div class="arrow" style="top:580px;right:205px;transform:scaleX(-1)">${ARROW}</div>
+      <svg class="swoosh" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none"
+           stroke="#16A0B0" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 1010 360 C 1180 400, 1330 460, 1430 540" stroke-dasharray="2 26"/>
+        <path d="M 1390 500 L 1436 546 L 1366 562" />
+        <path d="M 852 700 L 884 728"/>
+        <path d="M 806 754 L 848 766"/>
+        <path d="M 902 662 L 916 700"/>
+      </svg>
 
-      <div class="doodle" style="top:170px;left:950px">${sparkle(56, 8)}</div>
-      <div class="doodle" style="top:480px;left:726px">${sparkle(40, -14)}</div>
-      <div class="doodle" style="top:54px;left:586px">${sparkle(36, 18)}</div>
+      <div class="doodle" style="top:284px;left:1150px">${sparkle(48, 10)}</div>
+      <div class="doodle" style="top:100px;left:744px">${sparkle(36, -12)}</div>
+      <div class="doodle" style="top:560px;left:700px">${sparkle(40, 18)}</div>
 
-      <div class="copy">
-        <span class="line">One photo in. An heirloom out.</span>
-        <span class="cta">Try Magic Engraver</span>
-      </div>
+      <div class="eyebrow">Magic Engraver</div>
+      <div class="logo"><img src="${logo}" alt="Glowforge"/></div>
+      <div class="tagline">One photo in. An heirloom out.</div>
+      <div class="cta">Try Magic Engraver</div>
     </div>
   </body></html>`;
 
