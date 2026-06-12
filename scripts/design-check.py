@@ -91,7 +91,9 @@ def check_circle(gray, sub, x, y, scale, c):
         dx, dy = circle[0] - ex, circle[1] - ey
         report["circle_vs_expected"] = [round(dx, 1), round(dy, 1)]
         ok = ok and abs(dx) <= tol and abs(dy) <= tol
-    motif = ink_motif(sub, dcx, dcy, dr)
+    # Motif-centering is meaningful for clean line art on a plain field, not
+    # for photos (asymmetric dark fur skews the ink bbox). Opt out per check.
+    motif = ink_motif(sub, dcx, dcy, dr) if c.get("check_motif", True) else None
     if motif:
         cen, bbox = motif
         dx = (x + bbox[0]) / scale - circle[0]

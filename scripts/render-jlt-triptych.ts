@@ -45,22 +45,22 @@ async function main() {
   const sEng = subjects["milo-engrave2.png"];
   const ENG_ASPECT = sEng.h / sEng.w;
 
-  // P1 photo circle: face centered via coverCrop.
+  // P1 photo circle: face centered via coverCrop, circle centered in panel 1.
   const CIRC = 480;
   const circCrop = coverCrop(sPhoto, { w: CIRC, h: CIRC }, 0.82);
-  const circX = 240, circY = 490; // circle left/top — crosses gutter 1
+  const circX = (P - CIRC) / 2, circY = 500; // centered in P1
 
-  // P3 scene: bottom-anchored cover of the panel; coaster face lands where
-  // the geometry puts it — we compute it and place the motif + ring there.
+  // P3 scene: cover of the panel; coaster face lands where the geometry puts
+  // it — we compute it and place the engraving (big, name below) there.
   const ps = 1080 / 1024; // cover height exactly
   const sceneW = 1024 * ps;
   const sceneLeft = 1280 - 170; // canvas coords; face roughly panel-center
   const faceCx = sceneLeft + (sScene.subject.x + sScene.subject.w / 2) * sceneW;
   const faceCy = (sScene.subject.y + sScene.subject.h / 2) * sceneW;
   const faceD = sScene.subject.w * sceneW;
-  const engW = faceD * 0.54;
+  const engW = faceD * 0.70;            // bigger Milo on the coaster
   const engH = engW * ENG_ASPECT;
-  const nameH = 60, nameGap = 6;
+  const nameH = 46, nameGap = 4;
   const motifTop = faceCy - (engH + nameGap + nameH) / 2;
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -85,13 +85,12 @@ async function main() {
     .circ{position:absolute;z-index:3;left:${circX}px;top:${circY}px;
       width:${CIRC}px;height:${CIRC}px;border-radius:50%;overflow:hidden;
       border:6px solid var(--ink);background:#fff}
-    .milo{position:absolute;z-index:3;left:800px;bottom:-14px;width:540px}
+    .milo{position:absolute;z-index:3;left:725px;top:36px;width:470px}
     .milo img{display:block;width:100%;height:auto}
 
-    .ring{position:absolute;z-index:4}
     .eng{position:absolute;z-index:3;mix-blend-mode:multiply;opacity:0.9}
     .nm{position:absolute;z-index:3;text-align:center;font-family:'Pacifico';
-      font-size:54px;color:#2a1408;mix-blend-mode:multiply;opacity:0.92}
+      font-size:46px;color:#2a1408;mix-blend-mode:multiply;opacity:0.92}
   </style></head><body>
     <div class="stage">
       <div class="p2"></div>
@@ -103,23 +102,13 @@ async function main() {
       <div class="rule" style="left:${P - 1}px"></div>
       <div class="rule" style="left:${2 * P - 1}px"></div>
 
-      <div class="word" style="left:60px;top:100px;color:var(--ink)">JUST</div>
-      <div class="word" style="left:680px;top:280px;color:var(--cream)">LIKE</div>
-      <div class="word" style="left:1320px;top:820px;color:var(--cream);
+      <div class="word" style="left:60px;top:80px;color:var(--ink)">JUST</div>
+      <div class="word" style="left:690px;top:760px;color:var(--cream)">LIKE</div>
+      <div class="word" style="left:1320px;top:60px;color:var(--cream);
         text-shadow:0 2px 18px rgba(28,24,19,0.35)">THAT</div>
 
       <div class="circ"><img src="${photo}" style="position:absolute;left:${circCrop.left.toFixed(1)}px;top:${circCrop.top.toFixed(1)}px;width:${circCrop.width.toFixed(1)}px;height:${circCrop.height.toFixed(1)}px"/></div>
       <div class="milo"><img src="${dogTeal}"/></div>
-
-      <svg class="ring" style="left:${(faceCx - 280).toFixed(0)}px;top:${(faceCy - 280).toFixed(0)}px" width="560" height="560"
-           viewBox="0 0 560 560" fill="none" stroke="#16A0B0" stroke-width="7" stroke-linecap="round">
-        <path d="M 280 26 C 420 28, 532 140, 530 280 C 528 420, 418 532, 278 530"/>
-        <path d="M 246 526 C 118 504, 28 398, 26 278 C 24 158, 118 42, 240 28"/>
-      </svg>
-
-      <div class="num" style="left:556px;color:var(--teal)">01</div>
-      <div class="num" style="left:1196px;color:var(--tint)">02</div>
-      <div class="num" style="left:1836px;color:var(--cream)">03</div>
 
       <div class="eyebrow">Magic Engraver</div>
       <div class="tagline">One photo in.<br/>An heirloom out.</div>
@@ -139,6 +128,7 @@ async function main() {
           radius: [CIRC * 0.42, CIRC * 0.56],
           expect_center: [circX + CIRC / 2, circY + CIRC / 2],
           tol: 8,
+          check_motif: false, // photo: face centered via coverCrop, not dark-pixel bbox
         },
         {
           // tol 8: engraving ink bbox is left-skewed by the tail.
@@ -151,8 +141,7 @@ async function main() {
         // Legibility: WCAG contrast of text against its field. Big display
         // type passes at 3.0; the small tagline/numerals held to AA 4.5.
         { type: "contrast", name: "tagline", region: [60, 360, 240, 84], min: 4.5 },
-        { type: "contrast", name: "num-03-on-wood", region: [1828, 50, 84, 40], min: 4.5 },
-        { type: "contrast", name: "like-on-teal", region: [690, 300, 470, 230], min: 3.0 },
+        { type: "contrast", name: "like-on-teal", region: [690, 770, 470, 240], min: 3.0 },
         { type: "contrast", name: "milo-name-on-wood",
           region: [(faceCx - 150) | 0, (motifTop + engH + nameGap) | 0, 300, nameH], min: 3.0 },
       ],
