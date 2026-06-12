@@ -34,3 +34,8 @@ Thumbs.db
 
 # Canva OAuth tokens
 .canva-tokens.json
+
+# Third-party design references (canonical copies live in the Drive
+# "design references" folder; re-pulled locally, not redistributed via git)
+assets/design-references/*
+!assets/design-references/.gitkeep
