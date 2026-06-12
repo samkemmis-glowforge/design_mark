@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { renderSvg } from "../agent/tools/render-svg.js";
-import { coverCrop, type ImageInfo } from "../agent/render/layout.js";
+import { type ImageInfo } from "../agent/render/layout.js";
 import { REPO_ROOT } from "../agent/brand.js";
 
 /**
@@ -30,6 +30,7 @@ async function dataUri(absOrRel: string, mime: string): Promise<string> {
 
 async function main() {
   const photo = await dataUri("assets/magic-engraver/milo2.jpg", "image/jpeg");
+  const photoCut = await dataUri("assets/magic-engraver/milo2-cutout.png", "image/png");
   const dogTeal = await dataUri("assets/magic-engraver/m2-cut-teal.png", "image/png");
   const burnt = await dataUri("assets/magic-engraver/engrave2-burnt.png", "image/png");
   const scene = await dataUri("assets/magic-engraver/coaster-scene.png", "image/png");
@@ -45,10 +46,18 @@ async function main() {
   const sEng = subjects["milo-engrave2.png"];
   const ENG_ASPECT = sEng.h / sEng.w;
 
-  // P1 photo circle: face centered via coverCrop, circle centered in panel 1.
-  const CIRC = 480;
-  const circCrop = coverCrop(sPhoto, { w: CIRC, h: CIRC }, 0.82);
-  const circX = (P - CIRC) / 2, circY = 500; // centered in P1
+  // P1 "sticker pop-out": full photo clipped in the circle for context, the
+  // rembg cutout drawn on top at the SAME transform so ears/paws break the
+  // frame. Dog alpha bbox in milo2-cutout.png (measured): x .224-.934,
+  // y .016-.749, center (.579,.382); dog height set to 1.18× the circle.
+  const CIRC = 450;
+  const circCx = P / 2, circCy = 650;
+  const circX = circCx - CIRC / 2, circY = circCy - CIRC / 2;
+  const DOG = { cx: 0.579, cy: 0.382, h: 0.733 };
+  const popScale = (1.18 * CIRC) / (DOG.h * sPhoto.h);
+  const popW = sPhoto.w * popScale, popH = sPhoto.h * popScale;
+  const popLeft = circCx - DOG.cx * popW;
+  const popTop = circCy - DOG.cy * popH;
 
   // P3 scene: cover of the panel; coaster face lands where the geometry puts
   // it — we compute it and place the engraving (big, name below) there.
@@ -77,14 +86,10 @@ async function main() {
       letter-spacing:-0.045em;white-space:nowrap;line-height:1}
     .num{position:absolute;z-index:5;top:56px;font-weight:700;font-size:24px;
       letter-spacing:0.12em}
-    .eyebrow{position:absolute;z-index:5;top:56px;left:60px;font-weight:800;
-      font-size:20px;letter-spacing:0.24em;text-transform:uppercase;color:var(--ink)}
-    .tagline{position:absolute;z-index:2;left:62px;top:368px;font-weight:600;
-      font-size:24px;color:var(--ink)}
-
     .circ{position:absolute;z-index:3;left:${circX}px;top:${circY}px;
       width:${CIRC}px;height:${CIRC}px;border-radius:50%;overflow:hidden;
       border:6px solid var(--ink);background:#fff}
+    .pop{position:absolute;z-index:4}
     .milo{position:absolute;z-index:3;left:670px;top:20px;width:580px}
     .milo img{display:block;width:100%;height:auto}
 
@@ -107,11 +112,9 @@ async function main() {
       <div class="word" style="left:1300px;top:60px;color:var(--cream);
         text-shadow:0 2px 18px rgba(28,24,19,0.35)">THAT</div>
 
-      <div class="circ"><img src="${photo}" style="position:absolute;left:${circCrop.left.toFixed(1)}px;top:${circCrop.top.toFixed(1)}px;width:${circCrop.width.toFixed(1)}px;height:${circCrop.height.toFixed(1)}px"/></div>
+      <div class="circ"><img src="${photo}" style="position:absolute;left:${(popLeft - circX).toFixed(1)}px;top:${(popTop - circY).toFixed(1)}px;width:${popW.toFixed(1)}px;height:${popH.toFixed(1)}px"/></div>
+      <img class="pop" src="${photoCut}" style="left:${popLeft.toFixed(1)}px;top:${popTop.toFixed(1)}px;width:${popW.toFixed(1)}px;height:${popH.toFixed(1)}px"/>
       <div class="milo"><img src="${dogTeal}"/></div>
-
-      <div class="eyebrow">Magic Engraver</div>
-      <div class="tagline">One photo in.<br/>An heirloom out.</div>
     </div>
   </body></html>`;
 
@@ -128,7 +131,7 @@ async function main() {
           radius: [CIRC * 0.42, CIRC * 0.56],
           expect_center: [circX + CIRC / 2, circY + CIRC / 2],
           tol: 8,
-          check_motif: false, // photo: face centered via coverCrop, not dark-pixel bbox
+          check_motif: false, // photo: dog centered via measured alpha bbox
         },
         {
           // Validates the detected coaster sits where the layout expects.
@@ -147,9 +150,7 @@ async function main() {
           tol: 70,
           check_motif: false,
         },
-        // Legibility: WCAG contrast of text against its field. Big display
-        // type passes at 3.0; the small tagline held to AA 4.5.
-        { type: "contrast", name: "tagline", region: [60, 360, 240, 84], min: 4.5 },
+        // Legibility: WCAG contrast of display text against its field (3.0).
         { type: "contrast", name: "like-on-teal", region: [690, 742, 470, 250], min: 3.0 },
         { type: "contrast", name: "milo-name-on-wood",
           region: [(faceCx - 150) | 0, nameTop | 0, 300, 56], min: 3.0 },
