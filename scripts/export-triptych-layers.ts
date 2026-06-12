@@ -61,9 +61,9 @@ async function main() {
       bg: "#FDF8F1", p2: "#0E454D", ink: "#1C1813", cream: "#F9E7CB",
       // word font 250/280 = layer PNG display scale
       words: [
-        { src: "layer-word-just.png", color: "ink", x: 60, y: 80, w: 720 * 250 / 280, h: 300 * 250 / 280 },
-        { src: "layer-word-like.png", color: "cream", x: 690, y: 742, w: 600 * 250 / 280, h: 300 * 250 / 280 },
-        { src: "layer-word-that.png", color: "cream", x: 1300, y: 60, w: 770 * 250 / 280, h: 300 * 250 / 280 },
+        { src: "layer-word-just.png", color: "#1C1813", x: 60, y: 80, w: 720 * 250 / 280, h: 300 * 250 / 280 },
+        { src: "layer-word-like.png", color: "#F9E7CB", x: 690, y: 742, w: 600 * 250 / 280, h: 300 * 250 / 280 },
+        { src: "layer-word-that.png", color: "#0E454D", x: 1300, y: 60, w: 770 * 250 / 280, h: 300 * 250 / 280 },
       ],
       photoRing: { x: circX - PAD, y: circY - PAD, w: CIRC + 2 * PAD, h: CIRC + 2 * PAD },
       photoPop: { x: popLeft, y: popTop, w: popW, h: popH },

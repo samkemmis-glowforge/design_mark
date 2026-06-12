@@ -18,21 +18,22 @@ P = g["panel"]
 
 def hexc(s): return RGBColor(*(int(s[i:i+2], 16) for i in (1, 3, 5)))
 
-# helper PNGs: cream word recolors + P3 scene crop
-for wspec in g["words"]:
-    if wspec["color"] != "cream":
-        continue
-    im = Image.open(f"{L}/{wspec['src']}").convert("RGBA")
+# helper PNGs: recolor each ink word PNG to its target hex (keeps AA alpha)
+def recolor(src, hexstr):
+    im = Image.open(f"{L}/{src}").convert("RGBA")
     px = im.load()
-    cream = (0xF9, 0xE7, 0xCB)
+    c = tuple(int(hexstr[i:i+2], 16) for i in (1, 3, 5))
     for yy in range(im.height):
         for xx in range(im.width):
-            r, gg, b, al = px[xx, yy]
+            al = px[xx, yy][3]
             if al:
-                px[xx, yy] = (*cream, al)
-    out = wspec["src"].replace(".png", "-cream.png")
+                px[xx, yy] = (*c, al)
+    out = src.replace(".png", f"-{hexstr[1:]}.png")
     im.save(f"{L}/{out}")
-    wspec["src"] = out
+    return out
+
+for wspec in g["words"]:
+    wspec["src"] = recolor(wspec["src"], wspec["color"])
 
 scene = Image.open(f"{A}/coaster-scene.png").convert("RGB")
 sw = round(g["scene"]["sceneW"])

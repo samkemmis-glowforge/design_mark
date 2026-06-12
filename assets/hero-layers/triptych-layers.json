@@ -11,7 +11,7 @@
   "words": [
     {
       "src": "layer-word-just.png",
-      "color": "ink",
+      "color": "#1C1813",
       "x": 60,
       "y": 80,
       "w": 642.8571428571429,
@@ -19,7 +19,7 @@
     },
     {
       "src": "layer-word-like.png",
-      "color": "cream",
+      "color": "#F9E7CB",
       "x": 690,
       "y": 742,
       "w": 535.7142857142857,
@@ -27,7 +27,7 @@
     },
     {
       "src": "layer-word-that.png",
-      "color": "cream",
+      "color": "#0E454D",
       "x": 1300,
       "y": 60,
       "w": 687.5,

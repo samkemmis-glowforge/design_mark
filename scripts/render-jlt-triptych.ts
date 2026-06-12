@@ -109,8 +109,7 @@ async function main() {
 
       <div class="word" style="left:60px;top:80px;color:var(--ink)">JUST</div>
       <div class="word" style="left:690px;top:742px;color:var(--cream)">LIKE</div>
-      <div class="word" style="left:1300px;top:60px;color:var(--cream);
-        text-shadow:0 2px 18px rgba(28,24,19,0.35)">THAT</div>
+      <div class="word" style="left:1300px;top:60px;color:#0E454D">THAT</div>
 
       <div class="circ"><img src="${photo}" style="position:absolute;left:${(popLeft - circX).toFixed(1)}px;top:${(popTop - circY).toFixed(1)}px;width:${popW.toFixed(1)}px;height:${popH.toFixed(1)}px"/></div>
       <img class="pop" src="${photoCut}" style="left:${popLeft.toFixed(1)}px;top:${popTop.toFixed(1)}px;width:${popW.toFixed(1)}px;height:${popH.toFixed(1)}px"/>
@@ -152,6 +151,7 @@ async function main() {
         },
         // Legibility: WCAG contrast of display text against its field (3.0).
         { type: "contrast", name: "like-on-teal", region: [690, 742, 470, 250], min: 3.0 },
+        { type: "contrast", name: "that-on-wood", region: [1300, 80, 600, 210], min: 3.0 },
         { type: "contrast", name: "milo-name-on-wood",
           region: [(faceCx - 150) | 0, nameTop | 0, 300, 56], min: 3.0 },
       ],
