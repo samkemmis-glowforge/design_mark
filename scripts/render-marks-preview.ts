@@ -7,12 +7,15 @@ const files = (await readdir("assets/marks")).filter((f) => f.endsWith(".svg")).
 const svgs: Record<string, string> = {};
 for (const f of files) svgs[f] = await readFile(`assets/marks/${f}`, "utf8");
 
+const fit = (svg: string) =>
+  svg.replace("<svg ", `<svg style="max-width:150px;max-height:96px;width:auto;height:auto" `);
+
 const cell = (name: string, color: string) =>
-  `<div style="width:170px;text-align:center">
-     <div style="height:90px;display:flex;align-items:center;justify-content:center;color:${color}">
-       <div style="width:120px">${svgs[name]}</div>
+  `<div style="width:178px;text-align:center;overflow:hidden">
+     <div style="height:110px;display:flex;align-items:center;justify-content:center;color:${color}">
+       ${fit(svgs[name])}
      </div>
-     <div style="font-size:13px;font-weight:600;opacity:.7">${name.replace(".svg", "")}</div>
+     <div style="font-size:13px;font-weight:600;opacity:.7;margin-top:6px">${name.replace(".svg", "")}</div>
    </div>`;
 
 const row = (bg: string, fg: string) =>
@@ -37,5 +40,5 @@ const html = `<div style="font-family:Inter,sans-serif;width:1840px">
   </div>
 </div>`;
 
-await renderSvg({ markup: html, width: 1840, height: 580, outPath: "output/marks-preview.png" });
+await renderSvg({ markup: html, width: 1840, height: 760, outPath: "output/marks-preview.png" });
 console.log("preview done");

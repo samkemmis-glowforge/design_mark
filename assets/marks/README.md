@@ -7,8 +7,9 @@ rhythm on swooshes.
 Usage
 - All strokes are `currentColor` — set color via CSS (`color: #16A0B0` on
   the wrapper, or `color: #F9E7CB` on dark fields).
-- Scale freely via width/height; stroke widths are in viewBox units so they
-  scale with the mark (intended).
+- All paths use `vector-effect="non-scaling-stroke"`: the pen stays ~3px at
+  any rendered size, so the whole kit reads as one hand. Override weight via
+  CSS (`svg path { stroke-width: 2.5 }`) if needed.
 - `arrow-swoosh` is the drop-in replacement for the old pipeline-step arrows.
 - `circle-loop` is sized to wrap a word: position absolutely over the text at
   ~118% width, slight negative top offset (see scripts/render-marks-preview.ts

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 115" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round">
-  <path d="M 52 45 L 84 73"/>
-  <path d="M 6 99 L 48 111"/>
-  <path d="M 102 7 L 116 45"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+  <path vector-effect="non-scaling-stroke" d="M 50 52 C 60 60, 70 69, 80 78"/>
+  <path vector-effect="non-scaling-stroke" d="M 12 100 C 25 104, 37 107, 49 110"/>
+  <path vector-effect="non-scaling-stroke" d="M 98 14 C 102 26, 105 37, 109 49"/>
 </svg>

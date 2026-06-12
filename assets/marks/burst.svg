@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round">
-  <path d="M 50 8 L 50 28"/>
-  <path d="M 86 28 L 69 39"/>
-  <path d="M 88 70 L 70 61"/>
-  <path d="M 50 92 L 51 71"/>
-  <path d="M 13 71 L 31 61"/>
-  <path d="M 12 29 L 30 39"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+  <path vector-effect="non-scaling-stroke" d="M 50 10 C 50 16, 50 22, 50 28"/>
+  <path vector-effect="non-scaling-stroke" d="M 84 30 C 79 33, 74 36, 69 39"/>
+  <path vector-effect="non-scaling-stroke" d="M 85 69 C 80 66, 74 64, 69 61"/>
+  <path vector-effect="non-scaling-stroke" d="M 51 90 C 51 84, 51 78, 50 72"/>
+  <path vector-effect="non-scaling-stroke" d="M 15 70 C 21 67, 26 64, 31 61"/>
+  <path vector-effect="non-scaling-stroke" d="M 14 31 C 20 33, 25 36, 30 39"/>
 </svg>
