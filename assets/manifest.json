@@ -1,9 +1,9 @@
 {
   "repo": "samkemmis-glowforge/design_mark",
-  "ref": "assets-v1",
-  "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/",
-  "generated": "2026-06-15T17:35:49Z",
-  "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/<path>",
+  "ref": "claude/gifted-davinci-YFc85",
+  "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/",
+  "generated": "2026-06-15T17:37:50Z",
+  "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/<path>",
   "groups": {
     "marks_raster": {
       "description": "Hand-drawn doodle marks (Gemini-drawn raster, transparent PNG). Colorways: <name>.png=ink #1C1813, -teal #16A0B0, -cream #F9E7CB.",
@@ -13,181 +13,181 @@
         {
           "name": "arrow-loop-cream.png",
           "path": "assets/marks-gemini/arrow-loop-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-loop-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-loop-cream.png",
           "bytes": 13412
         },
         {
           "name": "arrow-loop-teal.png",
           "path": "assets/marks-gemini/arrow-loop-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-loop-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-loop-teal.png",
           "bytes": 13474
         },
         {
           "name": "arrow-loop.png",
           "path": "assets/marks-gemini/arrow-loop.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-loop.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-loop.png",
           "bytes": 13396
         },
         {
           "name": "arrow-straight-cream.png",
           "path": "assets/marks-gemini/arrow-straight-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-straight-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-straight-cream.png",
           "bytes": 6510
         },
         {
           "name": "arrow-straight-teal.png",
           "path": "assets/marks-gemini/arrow-straight-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-straight-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-straight-teal.png",
           "bytes": 6610
         },
         {
           "name": "arrow-straight.png",
           "path": "assets/marks-gemini/arrow-straight.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-straight.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-straight.png",
           "bytes": 6505
         },
         {
           "name": "arrow-swoosh-cream.png",
           "path": "assets/marks-gemini/arrow-swoosh-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-swoosh-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-swoosh-cream.png",
           "bytes": 14704
         },
         {
           "name": "arrow-swoosh-teal.png",
           "path": "assets/marks-gemini/arrow-swoosh-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-swoosh-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-swoosh-teal.png",
           "bytes": 14730
         },
         {
           "name": "arrow-swoosh.png",
           "path": "assets/marks-gemini/arrow-swoosh.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/arrow-swoosh.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/arrow-swoosh.png",
           "bytes": 14683
         },
         {
           "name": "asterisk-cream.png",
           "path": "assets/marks-gemini/asterisk-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/asterisk-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/asterisk-cream.png",
           "bytes": 13576
         },
         {
           "name": "asterisk-teal.png",
           "path": "assets/marks-gemini/asterisk-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/asterisk-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/asterisk-teal.png",
           "bytes": 13612
         },
         {
           "name": "asterisk.png",
           "path": "assets/marks-gemini/asterisk.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/asterisk.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/asterisk.png",
           "bytes": 13574
         },
         {
           "name": "burst-cream.png",
           "path": "assets/marks-gemini/burst-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/burst-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/burst-cream.png",
           "bytes": 11811
         },
         {
           "name": "burst-teal.png",
           "path": "assets/marks-gemini/burst-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/burst-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/burst-teal.png",
           "bytes": 11831
         },
         {
           "name": "burst.png",
           "path": "assets/marks-gemini/burst.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/burst.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/burst.png",
           "bytes": 11800
         },
         {
           "name": "circle-loop-cream.png",
           "path": "assets/marks-gemini/circle-loop-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/circle-loop-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/circle-loop-cream.png",
           "bytes": 25200
         },
         {
           "name": "circle-loop-teal.png",
           "path": "assets/marks-gemini/circle-loop-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/circle-loop-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/circle-loop-teal.png",
           "bytes": 25371
         },
         {
           "name": "circle-loop.png",
           "path": "assets/marks-gemini/circle-loop.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/circle-loop.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/circle-loop.png",
           "bytes": 25175
         },
         {
           "name": "snap-ticks-cream.png",
           "path": "assets/marks-gemini/snap-ticks-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/snap-ticks-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/snap-ticks-cream.png",
           "bytes": 5346
         },
         {
           "name": "snap-ticks-teal.png",
           "path": "assets/marks-gemini/snap-ticks-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/snap-ticks-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/snap-ticks-teal.png",
           "bytes": 5349
         },
         {
           "name": "snap-ticks.png",
           "path": "assets/marks-gemini/snap-ticks.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/snap-ticks.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/snap-ticks.png",
           "bytes": 5344
         },
         {
           "name": "sparkle-cream.png",
           "path": "assets/marks-gemini/sparkle-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/sparkle-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/sparkle-cream.png",
           "bytes": 19947
         },
         {
           "name": "sparkle-teal.png",
           "path": "assets/marks-gemini/sparkle-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/sparkle-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/sparkle-teal.png",
           "bytes": 20192
         },
         {
           "name": "sparkle.png",
           "path": "assets/marks-gemini/sparkle.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/sparkle.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/sparkle.png",
           "bytes": 19937
         },
         {
           "name": "underline-rough-cream.png",
           "path": "assets/marks-gemini/underline-rough-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/underline-rough-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/underline-rough-cream.png",
           "bytes": 15359
         },
         {
           "name": "underline-rough-teal.png",
           "path": "assets/marks-gemini/underline-rough-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/underline-rough-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/underline-rough-teal.png",
           "bytes": 15471
         },
         {
           "name": "underline-rough.png",
           "path": "assets/marks-gemini/underline-rough.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/underline-rough.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/underline-rough.png",
           "bytes": 15357
         },
         {
           "name": "underline-squiggle-cream.png",
           "path": "assets/marks-gemini/underline-squiggle-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/underline-squiggle-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/underline-squiggle-cream.png",
           "bytes": 13944
         },
         {
           "name": "underline-squiggle-teal.png",
           "path": "assets/marks-gemini/underline-squiggle-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/underline-squiggle-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/underline-squiggle-teal.png",
           "bytes": 13998
         },
         {
           "name": "underline-squiggle.png",
           "path": "assets/marks-gemini/underline-squiggle.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks-gemini/underline-squiggle.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks-gemini/underline-squiggle.png",
           "bytes": 13950
         }
       ]
@@ -200,61 +200,61 @@
         {
           "name": "arrow-loop.svg",
           "path": "assets/marks/arrow-loop.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/arrow-loop.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/arrow-loop.svg",
           "bytes": 395
         },
         {
           "name": "arrow-straight.svg",
           "path": "assets/marks/arrow-straight.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/arrow-straight.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/arrow-straight.svg",
           "bytes": 348
         },
         {
           "name": "arrow-swoosh.svg",
           "path": "assets/marks/arrow-swoosh.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/arrow-swoosh.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/arrow-swoosh.svg",
           "bytes": 349
         },
         {
           "name": "asterisk.svg",
           "path": "assets/marks/asterisk.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/asterisk.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/asterisk.svg",
           "bytes": 379
         },
         {
           "name": "burst.svg",
           "path": "assets/marks/burst.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/burst.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/burst.svg",
           "bytes": 618
         },
         {
           "name": "circle-loop.svg",
           "path": "assets/marks/circle-loop.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/circle-loop.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/circle-loop.svg",
           "bytes": 321
         },
         {
           "name": "snap-ticks.svg",
           "path": "assets/marks/snap-ticks.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/snap-ticks.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/snap-ticks.svg",
           "bytes": 388
         },
         {
           "name": "sparkle.svg",
           "path": "assets/marks/sparkle.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/sparkle.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/sparkle.svg",
           "bytes": 398
         },
         {
           "name": "underline-rough.svg",
           "path": "assets/marks/underline-rough.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/underline-rough.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/underline-rough.svg",
           "bytes": 369
         },
         {
           "name": "underline-squiggle.svg",
           "path": "assets/marks/underline-squiggle.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/marks/underline-squiggle.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/marks/underline-squiggle.svg",
           "bytes": 315
         }
       ]
@@ -267,145 +267,145 @@
         {
           "name": "cream-bg.png",
           "path": "assets/hero-layers/cream-bg.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/cream-bg.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/cream-bg.png",
           "bytes": 195
         },
         {
           "name": "hero-1920.png",
           "path": "assets/hero-layers/hero-1920.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/hero-1920.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/hero-1920.png",
           "bytes": 988613
         },
         {
           "name": "layer-cta-pill.png",
           "path": "assets/hero-layers/layer-cta-pill.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-cta-pill.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-cta-pill.png",
           "bytes": 12097
         },
         {
           "name": "layer-eyebrow.png",
           "path": "assets/hero-layers/layer-eyebrow.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-eyebrow.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-eyebrow.png",
           "bytes": 8266
         },
         {
           "name": "layer-milo-engraved.png",
           "path": "assets/hero-layers/layer-milo-engraved.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-milo-engraved.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-milo-engraved.png",
           "bytes": 2679070
         },
         {
           "name": "layer-photo-chip.png",
           "path": "assets/hero-layers/layer-photo-chip.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-photo-chip.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-photo-chip.png",
           "bytes": 371764
         },
         {
           "name": "layer-plaque-engraved.png",
           "path": "assets/hero-layers/layer-plaque-engraved.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-plaque-engraved.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-plaque-engraved.png",
           "bytes": 1753150
         },
         {
           "name": "layer-snap-ticks.png",
           "path": "assets/hero-layers/layer-snap-ticks.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-snap-ticks.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-snap-ticks.png",
           "bytes": 2395
         },
         {
           "name": "layer-sparkle.png",
           "path": "assets/hero-layers/layer-sparkle.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-sparkle.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-sparkle.png",
           "bytes": 9264
         },
         {
           "name": "layer-swoosh-arrow.png",
           "path": "assets/hero-layers/layer-swoosh-arrow.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-swoosh-arrow.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-swoosh-arrow.png",
           "bytes": 9538
         },
         {
           "name": "layer-tagline.png",
           "path": "assets/hero-layers/layer-tagline.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-tagline.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-tagline.png",
           "bytes": 11945
         },
         {
           "name": "layer-word-just-1C1813.png",
           "path": "assets/hero-layers/layer-word-just-1C1813.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-just-1C1813.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-just-1C1813.png",
           "bytes": 20433
         },
         {
           "name": "layer-word-just.png",
           "path": "assets/hero-layers/layer-word-just.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-just.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-just.png",
           "bytes": 24640
         },
         {
           "name": "layer-word-like-F9E7CB.png",
           "path": "assets/hero-layers/layer-word-like-F9E7CB.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-like-F9E7CB.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-like-F9E7CB.png",
           "bytes": 10867
         },
         {
           "name": "layer-word-like-cream.png",
           "path": "assets/hero-layers/layer-word-like-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-like-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-like-cream.png",
           "bytes": 10867
         },
         {
           "name": "layer-word-like.png",
           "path": "assets/hero-layers/layer-word-like.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-like.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-like.png",
           "bytes": 12279
         },
         {
           "name": "layer-word-that-0E454D.png",
           "path": "assets/hero-layers/layer-word-that-0E454D.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-that-0E454D.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-that-0E454D.png",
           "bytes": 11960
         },
         {
           "name": "layer-word-that-cream.png",
           "path": "assets/hero-layers/layer-word-that-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-that-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-that-cream.png",
           "bytes": 11970
         },
         {
           "name": "layer-word-that.png",
           "path": "assets/hero-layers/layer-word-that.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/layer-word-that.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/layer-word-that.png",
           "bytes": 13459
         },
         {
           "name": "milo-coaster-composite.png",
           "path": "assets/hero-layers/milo-coaster-composite.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/milo-coaster-composite.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/milo-coaster-composite.png",
           "bytes": 1635954
         },
         {
           "name": "milo-photo-popout.png",
           "path": "assets/hero-layers/milo-photo-popout.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/milo-photo-popout.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/milo-photo-popout.png",
           "bytes": 1373675
         },
         {
           "name": "milo-trace-transparent.png",
           "path": "assets/hero-layers/milo-trace-transparent.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/milo-trace-transparent.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/milo-trace-transparent.png",
           "bytes": 691805
         },
         {
           "name": "triptych-p3-scene.png",
           "path": "assets/hero-layers/triptych-p3-scene.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/triptych-p3-scene.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/triptych-p3-scene.png",
           "bytes": 969744
         },
         {
           "name": "triptych-photo-ring.png",
           "path": "assets/hero-layers/triptych-photo-ring.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/hero-layers/triptych-photo-ring.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/hero-layers/triptych-photo-ring.png",
           "bytes": 1160013
         }
       ]
@@ -418,73 +418,73 @@
         {
           "name": "coaster-scene.png",
           "path": "assets/magic-engraver/coaster-scene.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/coaster-scene.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/coaster-scene.png",
           "bytes": 781876
         },
         {
           "name": "engrave2-burnt.png",
           "path": "assets/magic-engraver/engrave2-burnt.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/engrave2-burnt.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/engrave2-burnt.png",
           "bytes": 691807
         },
         {
           "name": "m2-cut-cream.png",
           "path": "assets/magic-engraver/m2-cut-cream.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/m2-cut-cream.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/m2-cut-cream.png",
           "bytes": 1198824
         },
         {
           "name": "m2-cut-teal.png",
           "path": "assets/magic-engraver/m2-cut-teal.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/m2-cut-teal.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/m2-cut-teal.png",
           "bytes": 1143498
         },
         {
           "name": "milo-cutout.png",
           "path": "assets/magic-engraver/milo-cutout.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/milo-cutout.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/milo-cutout.png",
           "bytes": 3075861
         },
         {
           "name": "milo-engrave2.png",
           "path": "assets/magic-engraver/milo-engrave2.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/milo-engrave2.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/milo-engrave2.png",
           "bytes": 1340858
         },
         {
           "name": "milo-engraved.svg",
           "path": "assets/magic-engraver/milo-engraved.svg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/milo-engraved.svg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/milo-engraved.svg",
           "bytes": 1541562
         },
         {
           "name": "milo-photo.jpg",
           "path": "assets/magic-engraver/milo-photo.jpg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/milo-photo.jpg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/milo-photo.jpg",
           "bytes": 189605
         },
         {
           "name": "milo2-cutout.png",
           "path": "assets/magic-engraver/milo2-cutout.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/milo2-cutout.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/milo2-cutout.png",
           "bytes": 846857
         },
         {
           "name": "milo2.jpg",
           "path": "assets/magic-engraver/milo2.jpg",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/milo2.jpg",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/milo2.jpg",
           "bytes": 928966
         },
         {
           "name": "name-milo.png",
           "path": "assets/magic-engraver/name-milo.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/name-milo.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/name-milo.png",
           "bytes": 28376
         },
         {
           "name": "plaque-walnut.png",
           "path": "assets/magic-engraver/plaque-walnut.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/assets-v1/assets/magic-engraver/plaque-walnut.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/plaque-walnut.png",
           "bytes": 529544
         }
       ]

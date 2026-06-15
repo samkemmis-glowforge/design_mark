@@ -10,7 +10,7 @@ import json
 import os
 import time
 
-REF = "assets-v1"
+REF = "claude/gifted-davinci-YFc85"  # default branch (public); pin to a commit SHA for immutability
 OWNER, REPO = "samkemmis-glowforge", "design_mark"
 BASE = f"https://raw.githubusercontent.com/{OWNER}/{REPO}/{REF}/"
 
@@ -78,13 +78,16 @@ for key, g in manifest["groups"].items():
         lines.append(f"Example: {ex}")
     lines.append("")
 lines += [
-    "## Updating",
+    "## Updating & pinning",
     "",
-    "Edit assets, run `python3 scripts/gen-manifest.py`, commit, then move the tag:",
+    "URLs track the default branch, so editing an asset + committing updates the",
+    "URL's bytes automatically (latest-always). Re-run `python3 scripts/gen-manifest.py`",
+    "after adding/removing files to refresh the catalog.",
+    "",
+    "For an **immutable** pin (same bytes forever), swap the ref for a commit SHA:",
     "```",
-    f"git tag -f {REF} && git push -f origin {REF}",
+    f"{BASE.replace(REF, '<commit-sha>')}<path>",
     "```",
-    f"(or bump REF in the script to `assets-v2` for a new immutable version).",
     "",
 ]
 with open("assets/ASSETS.md", "w") as fh:
