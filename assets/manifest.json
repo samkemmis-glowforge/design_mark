@@ -2,7 +2,7 @@
   "repo": "samkemmis-glowforge/design_mark",
   "ref": "claude/gifted-davinci-YFc85",
   "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/",
-  "generated": "2026-06-22T22:09:39Z",
+  "generated": "2026-06-22T23:07:23Z",
   "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/<path>",
   "groups": {
     "marks_raster": {
@@ -492,13 +492,25 @@
     "social_ready": {
       "description": "Finished, ready-to-post social graphics (1:1 = 1080x1080, 4:5 = 1080x1350). Fetch by URL and post directly \u2014 no editing required.",
       "dir": "assets/social",
-      "count": 4,
+      "count": 8,
       "files": [
+        {
+          "name": "premium-c-outcome-191.png",
+          "path": "assets/social/premium-c-outcome-191.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-outcome-191.png",
+          "bytes": 2083518
+        },
         {
           "name": "premium-c-outcome-4x5.png",
           "path": "assets/social/premium-c-outcome-4x5.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-outcome-4x5.png",
           "bytes": 3816622
+        },
+        {
+          "name": "premium-c-outcome-9x16.png",
+          "path": "assets/social/premium-c-outcome-9x16.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-outcome-9x16.png",
+          "bytes": 4846866
         },
         {
           "name": "premium-c-outcome.png",
@@ -507,10 +519,22 @@
           "bytes": 3223328
         },
         {
+          "name": "premium-c-real-191.png",
+          "path": "assets/social/premium-c-real-191.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-real-191.png",
+          "bytes": 2551911
+        },
+        {
           "name": "premium-c-real-4x5.png",
           "path": "assets/social/premium-c-real-4x5.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-real-4x5.png",
           "bytes": 4465402
+        },
+        {
+          "name": "premium-c-real-9x16.png",
+          "path": "assets/social/premium-c-real-9x16.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-real-9x16.png",
+          "bytes": 5768622
         },
         {
           "name": "premium-c-real.png",

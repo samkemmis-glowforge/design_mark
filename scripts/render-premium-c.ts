@@ -46,6 +46,8 @@ async function render(fmt: SocialFormat, outPath: string) {
 async function main() {
   await render("ig-square", "output/premium-c-outcome.png");
   await render("ig-portrait", "output/premium-c-outcome-4x5.png");
+  await render("story", "output/premium-c-outcome-9x16.png");
+  await render("fb-link", "output/premium-c-outcome-191.png");
   process.exit(0);
 }
 main().catch((e) => { console.error("✗", e); process.exit(1); });

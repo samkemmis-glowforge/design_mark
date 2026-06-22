@@ -14,7 +14,7 @@ import { REPO_ROOT } from "../agent/brand.js";
 
 const du = async (r: string, m: string) => `data:${m};base64,${(await readFile(resolve(REPO_ROOT, r))).toString("base64")}`;
 
-async function render(fmt: SocialFormat, outPath: string) {
+async function render(fmt: SocialFormat, outPath: string, pos = "52% 42%") {
   const S = SOCIAL[fmt]; const W = S.w, H = S.h;
   const logo = await du("brand/logo/logo-full-250.png", "image/png");
   const photo = await du("assets/premium/maker-organizer.jpg", "image/jpeg");
@@ -22,7 +22,7 @@ async function render(fmt: SocialFormat, outPath: string) {
     :root{--teal:#16A0B0;--cream:#F9E7CB;--ink:#1C1813;}
     html,body{margin:0;padding:0}
     .stage{position:relative;width:${W}px;height:${H}px;font-family:'Inter',sans-serif;overflow:hidden;background:#1b3a5a}
-    .scene{position:absolute;inset:0;width:${W}px;height:${H}px;object-fit:cover;object-position:52% 42%}
+    .scene{position:absolute;inset:0;width:${W}px;height:${H}px;object-fit:cover;object-position:${pos}}
     .scrim{position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,28,45,.72) 0%, rgba(13,28,45,.42) 22%, rgba(13,28,45,0) 44%)}
     .eyebrow{position:absolute;top:${S.safe.top - 12}px;left:${S.safe.left}px;font-weight:800;font-size:21px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream)}
     .logo{position:absolute;top:${S.safe.top - 18}px;right:${S.safe.right}px}.logo img{height:30px;display:block;filter:drop-shadow(0 1px 6px rgba(0,0,0,.4))}
@@ -47,6 +47,8 @@ async function render(fmt: SocialFormat, outPath: string) {
 async function main() {
   await render("ig-square", "output/premium-c-real.png");
   await render("ig-portrait", "output/premium-c-real-4x5.png");
+  await render("story", "output/premium-c-real-9x16.png", "66% 40%");
+  await render("fb-link", "output/premium-c-real-191.png");
   process.exit(0);
 }
 main().catch((e) => { console.error("✗", e); process.exit(1); });
