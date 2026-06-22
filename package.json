@@ -2,7 +2,7 @@
   "name": "design-mark",
   "version": "0.1.0",
   "private": true,
-  "description": "Slack design-agent coworker — production engine for on-brand marketing assets",
+  "description": "Slack design-agent coworker \u2014 production engine for on-brand marketing assets",
   "type": "module",
   "scripts": {
     "render": "tsx agent/tools/render-template.ts",
@@ -10,14 +10,17 @@
     "typecheck": "tsc --noEmit",
     "agent": "tsx agent/index.ts",
     "slack": "tsx slack/app.ts",
-    "canva:auth": "tsx agent/canva/auth-cli.ts"
+    "canva:auth": "tsx agent/canva/auth-cli.ts",
+    "mcp": "tsx server/design-mcp.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.165",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/pacifico": "^5.2.7",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@slack/bolt": "^4.7.3",
     "@sparticuz/chromium": "^149.0.0",
+    "express": "^5.2.1",
     "playwright": "^1.49.0",
     "playwright-core": "^1.60.0",
     "zod": "^4.4.3"
