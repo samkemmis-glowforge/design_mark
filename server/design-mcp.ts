@@ -31,7 +31,7 @@ import { buildQueryOptions } from "../agent/runtime.js";
  */
 
 const PORT = Number(process.env.PORT ?? 8787);
-const BASE = (process.env.PUBLIC_BASE_URL ?? `http://localhost:${PORT}`).replace(/\/$/, "");
+const BASE = (process.env.PUBLIC_BASE_URL ?? process.env.RENDER_EXTERNAL_URL ?? `http://localhost:${PORT}`).replace(/\/$/, "");
 const OUT_DIR = resolve(REPO_ROOT, "output");
 const TOKEN = process.env.DESIGN_MCP_TOKEN;
 

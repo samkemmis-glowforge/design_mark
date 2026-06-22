@@ -1,0 +1,22 @@
+# Render Blueprint for the Design Mark MCP server.
+# Deploy: push to GitHub → render.com → New → Blueprint → pick this repo.
+# Then set the sync:false secrets in the dashboard.
+services:
+  - type: web
+    name: design-mark-mcp
+    runtime: docker
+    plan: starter            # 512MB; bump to standard if Chromium renders OOM
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: DESIGN_MCP_TOKEN   # bearer token consumers must send; Render generates one
+        generateValue: true
+      - key: IMAGE_PROVIDER
+        value: gemini
+      - key: GEMINI_IMAGE_MODEL
+        value: gemini-2.5-flash-image
+      - key: GEMINI_API_KEY     # set in dashboard — enables generate_image
+        sync: false
+      - key: ANTHROPIC_API_KEY  # set in dashboard — enables design_brief (the agent)
+        sync: false
+      # PUBLIC_BASE_URL is optional: the server falls back to RENDER_EXTERNAL_URL.

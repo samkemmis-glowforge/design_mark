@@ -46,3 +46,22 @@ Add to that repo's `.mcp.json`:
 
 The agent then has `design_brief`, `render_svg`, etc. in its toolbelt and gets back
 image URLs it can drop straight into its own work.
+
+## Deploy to Render (Docker Blueprint)
+
+The repo ships a `Dockerfile` (Chromium libs baked in) and `render.yaml`.
+
+1. Push to GitHub (this repo is already public).
+2. render.com → **New → Blueprint** → pick this repo. It reads `render.yaml`
+   and provisions a Docker web service with a health check.
+3. In the dashboard set the two secrets: **`GEMINI_API_KEY`** (enables
+   `generate_image`) and **`ANTHROPIC_API_KEY`** (enables `design_brief`).
+   **`DESIGN_MCP_TOKEN`** is auto-generated — copy it from the Environment tab.
+4. Deploy. Your endpoint is `https://design-mark-mcp.onrender.com/mcp`
+   (the server auto-detects this via `RENDER_EXTERNAL_URL`, so image URLs are
+   correct with no extra config). Liveness: `/healthz`.
+5. Hand consumers the `.mcp.json` block above with that URL + token.
+
+Notes: `plan: starter` stays warm; the free plan cold-starts on idle. Rendered
+files live on the instance's ephemeral disk (fine — consumers fetch the URL
+right after generation).
