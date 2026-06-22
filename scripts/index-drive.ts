@@ -65,19 +65,24 @@ async function main() {
     process.exit(0);
   }
 
-  let done = 0, skip = 0;
-  for (const img of images) {
-    if (!force && index[`drive:${img.id}`]) { skip++; continue; }
-    if (!img.thumb) { console.log(`· ${img.name}: no thumbnail`); continue; }
-    try {
-      const url = img.thumb.replace(/=s\d+$/, "=s768");
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-      const bytes = Buffer.from(await res.arrayBuffer());
-      const tags = await tagImage(bytes, "image/jpeg");
-      index[`drive:${img.id}`] = { name: img.name, source: "drive", driveId: img.id, driveUrl: img.web, folder: img.path, ...tags, indexed_at: new Date().toISOString() };
-      done++; if (done % 10 === 0) await writeFile(INDEX, JSON.stringify(index, null, 2)); // checkpoint
-      console.log(`✓ ${img.path}/${img.name} — ${tags.category}`);
-    } catch (e) { console.log(`✗ ${img.name}: ${e instanceof Error ? e.message : e}`); }
+  const CONC = Number(process.env.INDEX_CONCURRENCY ?? 5);
+  const todo = images.filter((img) => (force || !index[`drive:${img.id}`]) && img.thumb);
+  const skip = images.length - todo.length;
+  let done = 0;
+  for (let i = 0; i < todo.length; i += CONC) {
+    const batch = todo.slice(i, i + CONC);
+    await Promise.all(batch.map(async (img) => {
+      try {
+        const url = img.thumb!.replace(/=s\d+$/, "=s768");
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const bytes = Buffer.from(await res.arrayBuffer());
+        const tags = await tagImage(bytes, "image/jpeg");
+        index[`drive:${img.id}`] = { name: img.name, source: "drive", driveId: img.id, driveUrl: img.web, folder: img.path, ...tags, indexed_at: new Date().toISOString() };
+      } catch (e) { process.stdout.write(`\n✗ ${img.name}: ${e instanceof Error ? e.message : e}\n`); }
+    }));
+    done += batch.length;
+    await writeFile(INDEX, JSON.stringify(index, null, 2)); // checkpoint per batch
+    process.stdout.write(`tagged ${done}/${todo.length} (skipped ${skip})\r`);
   }
   await writeFile(INDEX, JSON.stringify(index, null, 2));
   console.log(`\nindexed ${done}, skipped ${skip}, total ${Object.keys(index).length} → assets/index.json`);

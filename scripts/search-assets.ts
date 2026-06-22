@@ -5,7 +5,7 @@ const hits = await searchAssets(q, 8);
 if (!hits.length) { console.log(`no matches for "${q}"`); process.exit(0); }
 console.log(`Top matches for "${q}":\n`);
 for (const h of hits) {
-  console.log(`  [${h.score}] ${h.name}  (${h.category})`);
+  console.log(`  [${h.score}] ${h.name}  (${h.subject_type}${h.product ? "/" + h.product : ""})`);
   console.log(`        ${h.caption}`);
   if (h.url) console.log(`        ${h.url}`);
   console.log();
