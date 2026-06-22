@@ -55,6 +55,16 @@ async function main() {
   await walk(FOLDER, "");
   console.log(`found ${images.length} images under the folder`);
 
+  if (process.argv.includes("--count")) {
+    const byFolder: Record<string, number> = {};
+    for (const i of images) byFolder[i.path || "/"] = (byFolder[i.path || "/"] ?? 0) + 1;
+    for (const [f, n] of Object.entries(byFolder).sort((a, b) => b[1] - a[1]))
+      console.log(`  ${n}\t${f}`);
+    const already = images.filter((i) => index[`drive:${i.id}`]).length;
+    console.log(`\n${images.length} images, ${already} already indexed, ${images.length - already} to tag. (preflight only; no tagging)`);
+    process.exit(0);
+  }
+
   let done = 0, skip = 0;
   for (const img of images) {
     if (!force && index[`drive:${img.id}`]) { skip++; continue; }
