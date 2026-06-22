@@ -8,6 +8,8 @@ import { Buffer } from "node:buffer";
  * Env: GEMINI_API_KEY (or GOOGLE_API_KEY); GEMINI_VISION_MODEL (default gemini-2.5-flash).
  */
 
+import { geminiFetch } from "../util/gemini-fetch.js";
+
 export interface AssetTags {
   caption: string;
   subject_type: string;
@@ -55,7 +57,7 @@ export async function tagImage(bytes: Buffer, mimeType: string): Promise<AssetTa
   if (!key) throw new Error("GEMINI_API_KEY (or GOOGLE_API_KEY) is not set.");
   const model = process.env.GEMINI_VISION_MODEL ?? "gemini-2.5-flash";
 
-  const res = await fetch(
+  const res = await geminiFetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: "POST",

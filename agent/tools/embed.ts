@@ -4,11 +4,13 @@
  * Env: GEMINI_API_KEY (or GOOGLE_API_KEY); GEMINI_EMBED_MODEL (default gemini-embedding-001).
  */
 
+import { geminiFetch } from "../util/gemini-fetch.js";
+
 export async function embedText(text: string, taskType: "RETRIEVAL_QUERY" | "RETRIEVAL_DOCUMENT" = "RETRIEVAL_QUERY"): Promise<number[]> {
   const key = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY (or GOOGLE_API_KEY) is not set.");
   const model = process.env.GEMINI_EMBED_MODEL ?? "gemini-embedding-001";
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`, {
+  const res = await geminiFetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": key },
     body: JSON.stringify({ model: `models/${model}`, content: { parts: [{ text }] }, taskType, outputDimensionality: 768 }),
