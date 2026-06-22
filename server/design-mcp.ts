@@ -117,12 +117,14 @@ function makeServer(): McpServer {
     inputSchema: {
       query: z.string().describe("Natural-language description, e.g. 'warm holiday gift scene with wooden coasters'."),
       limit: z.number().optional().describe("Max results (default 8)."),
+      subject_type: z.enum(["hardware", "software-ui", "finished-project", "lifestyle", "packaging", "branding", "promo-graphic", "other"]).optional()
+        .describe("Hard filter — e.g. 'software-ui' for in-app screenshots only, 'hardware' for machine shots."),
     },
-  }, async ({ query, limit }) => {
+  }, async ({ query, limit, subject_type }) => {
     try {
-      const hits = await searchAssets(query, limit ?? 8);
+      const hits = await searchAssets(query, limit ?? 8, subject_type);
       const text = hits.length
-        ? hits.map((h) => `• ${h.name} (${h.category}, ${h.score}) — ${h.caption}\n  ${h.url ?? ""}`).join("\n")
+        ? hits.map((h) => `• ${h.name} [${h.subject_type}${h.product ? "/" + h.product : ""}] (${h.score}) — ${h.caption}\n  ${h.url ?? ""}`).join("\n")
         : `No matches for "${query}".`;
       return { content: [{ type: "text" as const, text }], structuredContent: { hits } };
     } catch (e) { return errResult(e); }

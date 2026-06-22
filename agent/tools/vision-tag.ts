@@ -10,11 +10,12 @@ import { Buffer } from "node:buffer";
 
 export interface AssetTags {
   caption: string;
-  category: string;
+  subject_type: string;
+  product: string;
+  features: string[];
   tags: string[];
   colors: string[];
   objects: string[];
-  orientation: "square" | "portrait" | "landscape";
   has_text: boolean;
   suggested_use: string;
 }
@@ -23,21 +24,30 @@ const SCHEMA = {
   type: "object",
   properties: {
     caption: { type: "string", description: "One concise sentence describing the image." },
-    category: { type: "string", description: "e.g. product-shot, lifestyle, logo, illustration, ui-screenshot, social-graphic, texture, icon, photo-people." },
+    subject_type: {
+      type: "string",
+      enum: ["hardware", "software-ui", "finished-project", "lifestyle", "packaging", "branding", "promo-graphic", "other"],
+      description: "Primary subject: hardware=the physical laser machine is the focus; software-ui=a screenshot/mockup of the app/web interface; finished-project=a laser-made object; lifestyle=people/makers/scenes; packaging; branding=logo/wordmark; promo-graphic=composed ad with copy.",
+    },
+    product: { type: "string", description: "Named Glowforge product if identifiable (e.g. 'Aura', 'Spark', 'Pro', 'Glowforge app', 'Premium'), else empty." },
+    features: { type: "array", items: { type: "string" }, description: "Software features shown/named (e.g. 'Smartfit', 'Magic Canvas', 'AI design', 'catalog', 'Print'). Empty if none." },
     tags: { type: "array", items: { type: "string" }, description: "5–12 lowercase search keywords." },
-    colors: { type: "array", items: { type: "string" }, description: "2–4 dominant colors as plain names or hex." },
+    colors: { type: "array", items: { type: "string" }, description: "2–4 dominant colors (names or hex)." },
     objects: { type: "array", items: { type: "string" }, description: "Key objects/subjects visible." },
-    orientation: { type: "string", enum: ["square", "portrait", "landscape"] },
     has_text: { type: "boolean", description: "Does the image contain rendered text/copy?" },
-    suggested_use: { type: "string", description: "Where a marketer would use this (e.g. 'IG feed background', 'hero banner', 'icon')." },
+    suggested_use: { type: "string", description: "Where a marketer would use this." },
   },
-  required: ["caption", "category", "tags", "colors", "objects", "orientation", "has_text", "suggested_use"],
+  required: ["caption", "subject_type", "product", "features", "tags", "colors", "objects", "has_text", "suggested_use"],
 };
 
 const PROMPT =
-  "You are cataloguing a marketing asset for a searchable library. Analyze the image and return " +
-  "metadata as JSON matching the schema. Be specific and use natural search terms a marketer would " +
-  "type. Lowercase tags. If it's a brand/product image, name the product type and setting.";
+  "You are cataloguing a Glowforge marketing asset for a searchable library. Glowforge makes BOTH " +
+  "hardware (laser cutter/engraver machines — product lines include Aura, Spark, Pro, Plus, Basic) AND " +
+  "software (the Glowforge web/app design tool, with features like Smartfit auto-nesting, Magic Canvas / " +
+  "AI design, the catalog, and Print). Classify the image precisely with the schema — especially " +
+  "`subject_type` (distinguish a hardware machine shot from a software-ui screenshot from a finished " +
+  "laser-made project), `product` (name it if you can tell), and `features` (any software features shown). " +
+  "Use specific, natural search terms a marketer would type. Lowercase tags.";
 
 /** Tag a single image (raw bytes). Returns structured metadata. */
 export async function tagImage(bytes: Buffer, mimeType: string): Promise<AssetTags> {

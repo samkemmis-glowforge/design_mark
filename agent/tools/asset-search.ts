@@ -12,15 +12,16 @@ import { embedText, cosine } from "./embed.js";
  */
 
 export interface AssetHit {
-  key: string; name: string; caption: string; category: string;
-  tags: string[]; url?: string; score: number;
+  key: string; name: string; caption: string; subject_type: string;
+  product?: string; features?: string[]; tags: string[]; url?: string; score: number;
 }
 
 const INDEX = resolve(REPO_ROOT, "assets/index.json");
 const EMB = resolve(REPO_ROOT, "assets/embeddings.json");
 
 function keywordScore(e: any, terms: string[]): number {
-  const hay = [e.name, e.caption, e.category, e.suggested_use, ...(e.tags ?? []), ...(e.objects ?? []), ...(e.colors ?? [])]
+  const hay = [e.name, e.caption, e.subject_type ?? e.category, e.product, e.suggested_use,
+    ...(e.features ?? []), ...(e.tags ?? []), ...(e.objects ?? []), ...(e.colors ?? [])]
     .join(" ").toLowerCase();
   let s = 0;
   for (const t of terms) {
@@ -30,9 +31,13 @@ function keywordScore(e: any, terms: string[]): number {
   return s;
 }
 
-export async function searchAssets(query: string, limit = 8): Promise<AssetHit[]> {
+export async function searchAssets(query: string, limit = 8, subjectType?: string): Promise<AssetHit[]> {
   if (!existsSync(INDEX)) return [];
-  const index = JSON.parse(await readFile(INDEX, "utf8")) as Record<string, any>;
+  const all = JSON.parse(await readFile(INDEX, "utf8")) as Record<string, any>;
+  // Optional hard filter, e.g. subjectType="software-ui" to get only app shots.
+  const index = subjectType
+    ? Object.fromEntries(Object.entries(all).filter(([, e]) => (e.subject_type ?? e.category) === subjectType))
+    : all;
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   let emb: Record<string, number[]> | null = null;
@@ -56,7 +61,8 @@ export async function searchAssets(query: string, limit = 8): Promise<AssetHit[]
     .slice(0, limit);
 
   return ranked.map(({ key, e, score }) => ({
-    key, name: e.name, caption: e.caption ?? "", category: e.category ?? "",
+    key, name: e.name, caption: e.caption ?? "", subject_type: e.subject_type ?? e.category ?? "",
+    product: e.product || undefined, features: e.features?.length ? e.features : undefined,
     tags: e.tags ?? [], url: e.driveUrl ?? e.url, score: +score.toFixed(3),
   }));
 }

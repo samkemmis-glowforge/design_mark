@@ -30,3 +30,13 @@ The MCP server exposes **`search_assets`** — other agents call it with a
 natural-language query and get back ranked matches (caption, tags, URL). So
 Design Mark can find and reuse a real asset from Drive while composing, instead
 of being handed links.
+
+
+## What's captured per asset
+`caption`, **`subject_type`** (hardware · software-ui · finished-project · lifestyle ·
+packaging · branding · promo-graphic), **`product`** (Aura/Spark/Pro/Glowforge app/
+Premium…), **`features`** (Smartfit, Magic Canvas/AI, catalog, Print…), `tags`,
+`colors`, `objects`, `has_text`, `suggested_use`, plus a semantic embedding. The
+prompt knows Glowforge sells **both hardware and software**, so it distinguishes a
+machine photo from an in-app screenshot from a finished project. Filter on it:
+`search_assets({ query, subject_type: "software-ui" })` for in-app shots only.

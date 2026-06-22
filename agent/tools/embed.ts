@@ -21,8 +21,9 @@ export async function embedText(text: string, taskType: "RETRIEVAL_QUERY" | "RET
 }
 
 /** Text profile of an indexed asset, used as the document to embed. */
-export function assetProfile(e: { caption?: string; category?: string; tags?: string[]; objects?: string[]; suggested_use?: string; name?: string }): string {
-  return [e.name, e.caption, e.category, (e.tags ?? []).join(", "), (e.objects ?? []).join(", "), e.suggested_use]
+export function assetProfile(e: { caption?: string; subject_type?: string; product?: string; features?: string[]; category?: string; tags?: string[]; objects?: string[]; suggested_use?: string; name?: string }): string {
+  return [e.name, e.caption, e.subject_type ?? e.category, e.product, (e.features ?? []).join(", "),
+    (e.tags ?? []).join(", "), (e.objects ?? []).join(", "), e.suggested_use]
     .filter(Boolean).join(". ");
 }
 
