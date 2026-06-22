@@ -16,7 +16,17 @@ npm run search -- holiday coasters gift     # ranked matches w/ Drive links
   3. `npm run index:drive`   (incremental; `-- --force` re-tags all)
 - **From local files:** `npm run index:local -- assets/premium assets/marks-gemini`
 
-Tagging uses Gemini vision (`agent/tools/vision-tag.ts`). The Drive walker tags
-each file's ~768px thumbnail (fast/cheap, no full download). Next step: add
-vector embeddings to `index.json` for true semantic search, and expose a
-`search_assets` tool on the MCP server so other agents query it remotely.
+## Semantic search (embeddings)
+Each entry also gets a 768-d Gemini embedding in `assets/embeddings.json`, so
+search matches *meaning*, not just keywords ("hot drinks" finds coffee/tea).
+Build/refresh: `npm run index:embed` (after indexing). `search_assets` and the
+CLI use it automatically; without a GEMINI key they fall back to keyword.
+
+Tagging uses Gemini vision (`agent/tools/vision-tag.ts`); the Drive walker tags
+each file's ~768px thumbnail (fast/cheap, no full download).
+
+## For agents (MCP)
+The MCP server exposes **`search_assets`** — other agents call it with a
+natural-language query and get back ranked matches (caption, tags, URL). So
+Design Mark can find and reuse a real asset from Drive while composing, instead
+of being handed links.

@@ -43,6 +43,7 @@ async function main() {
         q: `'${folderId}' in parents and trashed=false`,
         fields: "nextPageToken, files(id,name,mimeType,thumbnailLink,webViewLink)",
         pageSize: 1000, pageToken,
+        supportsAllDrives: true, includeItemsFromAllDrives: true,
       });
       for (const f of r.data.files ?? []) {
         if (f.mimeType === "application/vnd.google-apps.folder") await walk(f.id!, `${path}/${f.name}`);

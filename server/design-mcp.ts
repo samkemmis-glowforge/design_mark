@@ -14,6 +14,7 @@ import { renderTemplate } from "../agent/tools/render-template.js";
 import { generateImage } from "../agent/tools/generate-image.js";
 import { buildDesignServer, type DesignHostTransports } from "../agent/design-server.js";
 import { buildQueryOptions } from "../agent/runtime.js";
+import { searchAssets } from "../agent/tools/asset-search.js";
 
 /**
  * Design Mark as a remote MCP server (Streamable HTTP) so other agents — in any
@@ -107,6 +108,23 @@ function makeServer(): McpServer {
     try {
       const manifest = await readFile(resolve(REPO_ROOT, "assets/manifest.json"), "utf8");
       return { content: [{ type: "text" as const, text: manifest }], structuredContent: JSON.parse(manifest) };
+    } catch (e) { return errResult(e); }
+  });
+
+  server.registerTool("search_assets", {
+    title: "Search the marketing asset library (semantic)",
+    description: "Find existing brand/marketing images by description. Semantic search over the catalog — returns ranked matches with caption, tags, and a URL (Drive link or raw asset URL). Use before generating new imagery to reuse what already exists.",
+    inputSchema: {
+      query: z.string().describe("Natural-language description, e.g. 'warm holiday gift scene with wooden coasters'."),
+      limit: z.number().optional().describe("Max results (default 8)."),
+    },
+  }, async ({ query, limit }) => {
+    try {
+      const hits = await searchAssets(query, limit ?? 8);
+      const text = hits.length
+        ? hits.map((h) => `• ${h.name} (${h.category}, ${h.score}) — ${h.caption}\n  ${h.url ?? ""}`).join("\n")
+        : `No matches for "${query}".`;
+      return { content: [{ type: "text" as const, text }], structuredContent: { hits } };
     } catch (e) { return errResult(e); }
   });
 
