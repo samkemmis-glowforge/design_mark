@@ -11,7 +11,10 @@
     "agent": "tsx agent/index.ts",
     "slack": "tsx slack/app.ts",
     "canva:auth": "tsx agent/canva/auth-cli.ts",
-    "mcp": "tsx server/design-mcp.ts"
+    "mcp": "tsx server/design-mcp.ts",
+    "index:drive": "tsx scripts/index-drive.ts",
+    "index:local": "tsx scripts/index-assets.ts",
+    "search": "tsx scripts/search-assets.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.165",
@@ -21,10 +24,11 @@
     "@slack/bolt": "^4.7.3",
     "@sparticuz/chromium": "^149.0.0",
     "express": "^5.2.1",
+    "googleapis": "^173.0.0",
     "playwright": "^1.49.0",
     "playwright-core": "^1.60.0",
-    "zod": "^4.4.3",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
