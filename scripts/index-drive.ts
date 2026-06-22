@@ -36,7 +36,10 @@ async function main() {
   // Recurse: collect image files with their folder path.
   type Img = { id: string; name: string; mimeType: string; thumb?: string; web?: string; path: string };
   const images: Img[] = [];
+  let folders = 0;
   async function walk(folderId: string, path: string) {
+    folders++;
+    process.stdout.write(`scanning [${folders}] ${path || "/"}  (${images.length} images so far)\n`);
     let pageToken: string | undefined;
     do {
       const r = await drive.files.list({
@@ -45,15 +48,17 @@ async function main() {
         pageSize: 1000, pageToken,
         supportsAllDrives: true, includeItemsFromAllDrives: true,
       });
-      for (const f of r.data.files ?? []) {
-        if (f.mimeType === "application/vnd.google-apps.folder") await walk(f.id!, `${path}/${f.name}`);
-        else if (f.mimeType?.startsWith("image/")) images.push({ id: f.id!, name: f.name!, mimeType: f.mimeType!, thumb: f.thumbnailLink ?? undefined, web: f.webViewLink ?? undefined, path });
-      }
+      const kids = r.data.files ?? [];
+      // images first (cheap), then recurse subfolders
+      for (const f of kids) if (f.mimeType?.startsWith("image/"))
+        images.push({ id: f.id!, name: f.name!, mimeType: f.mimeType!, thumb: f.thumbnailLink ?? undefined, web: f.webViewLink ?? undefined, path });
+      for (const f of kids) if (f.mimeType === "application/vnd.google-apps.folder")
+        await walk(f.id!, `${path}/${f.name}`);
       pageToken = r.data.nextPageToken ?? undefined;
     } while (pageToken);
   }
   await walk(FOLDER, "");
-  console.log(`found ${images.length} images under the folder`);
+  console.log(`\nscanned ${folders} folders — found ${images.length} images`);
 
   if (process.argv.includes("--count")) {
     const byFolder: Record<string, number> = {};
