@@ -24,6 +24,9 @@ GROUPS = {
                     "Magic Engraver hero composition layers (transparent PNG)."),
     "product_assets": ("assets/magic-engraver", ("*.png", "*.jpg", "*.svg"),
                        "Source product assets: Milo photo, engravings, coaster scene, cutouts."),
+    "social_ready": ("assets/social", ("*.png", "*.jpg"),
+                     "Finished, ready-to-post social graphics (1:1 = 1080x1080, 4:5 = 1080x1350). "
+                     "Fetch by URL and post directly — no editing required."),
 }
 
 manifest = {

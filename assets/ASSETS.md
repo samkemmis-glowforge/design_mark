@@ -34,6 +34,11 @@ Source product assets: Milo photo, engravings, coaster scene, cutouts.
 
 Example: https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/magic-engraver/coaster-scene.png
 
+### social_ready (4 files)
+Finished, ready-to-post social graphics (1:1 = 1080x1080, 4:5 = 1080x1350). Fetch by URL and post directly — no editing required.
+
+Example: https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-outcome-4x5.png
+
 ## Updating & pinning
 
 URLs track the default branch, so editing an asset + committing updates the
