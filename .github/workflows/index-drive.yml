@@ -1,0 +1,87 @@
+name: Index marketing Drive
+
+# Run the reusability-gated Drive indexer from the GitHub UI (Actions tab →
+# "Index marketing Drive" → Run workflow). No terminal needed. Results
+# (assets/index.json, seen.json, embeddings.json) are committed back to this
+# branch. Resumable: re-run to continue — already-processed ids are skipped.
+#
+# One-time setup — add two repo secrets (Settings → Secrets and variables → Actions):
+#   GEMINI_API_KEY  — your Gemini key
+#   GDRIVE_SA_KEY   — the FULL JSON of the Drive service-account key (paste contents)
+# and make sure that service account has Viewer on the Drive folder.
+
+on:
+  workflow_dispatch:
+    inputs:
+      folder_id:
+        description: "Drive folder ID to index"
+        required: true
+        default: "1qlMHxtqPHxCxjlXZRgbdf_jA1maf3p7f"
+      limit:
+        description: "Max NEW images to process this run (keeps it under the 6h cap; re-run to continue)"
+        required: true
+        default: "2000"
+      force:
+        description: "Re-triage already-indexed images too"
+        type: boolean
+        default: false
+      run_embed:
+        description: "Embed the keepers after indexing"
+        type: boolean
+        default: true
+
+# Never let two index runs clobber each other's commit.
+concurrency:
+  group: index-drive
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      DRIVE_FOLDER_ID: ${{ github.event.inputs.folder_id }}
+      INDEX_CONCURRENCY: "8"
+      LIMIT: ${{ github.event.inputs.limit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/gifted-davinci-YFc85
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Write Drive service-account key
+        env:
+          SA: ${{ secrets.GDRIVE_SA_KEY }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+
+      - name: Triage + index
+        run: npm run index:drive -- ${{ github.event.inputs.force == 'true' && '--force' || '' }}
+
+      - name: Embed keepers
+        if: ${{ github.event.inputs.run_embed == 'true' }}
+        run: npm run index:embed
+
+      - name: Commit results
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/index.json assets/seen.json assets/embeddings.json
+          if git diff --staged --quiet; then
+            echo "No index changes to commit."
+          else
+            git commit -m "Index marketing Drive via Actions (folder ${{ github.event.inputs.folder_id }})"
+            git push origin HEAD:claude/gifted-davinci-YFc85
+          fi

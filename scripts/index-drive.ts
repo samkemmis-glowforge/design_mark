@@ -82,8 +82,16 @@ async function main() {
   }
 
   const CONC = Number(process.env.INDEX_CONCURRENCY ?? 5);
-  const todo = images.filter((img) => (force || !seen[`drive:${img.id}`]) && img.thumb);
-  const skip = images.length - todo.length;
+  // --limit N (or LIMIT env): process at most N new images this run, so a single
+  // run stays time-boxed (e.g. under CI job limits). Re-run to resume — already
+  // processed ids are in seen.json and skipped.
+  const limArg = process.argv.indexOf("--limit");
+  const limit = Number(limArg >= 0 ? process.argv[limArg + 1] : process.env.LIMIT ?? 0) || 0;
+  const todoAll = images.filter((img) => (force || !seen[`drive:${img.id}`]) && img.thumb);
+  const todo = limit > 0 ? todoAll.slice(0, limit) : todoAll;
+  const skip = images.length - todoAll.length;
+  if (limit > 0 && todoAll.length > todo.length)
+    console.log(`limiting to ${todo.length} of ${todoAll.length} remaining this run (re-run to continue)`);
   let done = 0, kept = 0, rejected = 0;
   for (let i = 0; i < todo.length; i += CONC) {
     const batch = todo.slice(i, i + CONC);
