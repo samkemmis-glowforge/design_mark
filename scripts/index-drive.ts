@@ -7,8 +7,15 @@ import { REPO_ROOT } from "../agent/brand.js";
 
 /**
  * Walk a Google Drive folder (recursively), tag every image with the vision
- * model, and write a searchable index (assets/index.json). Tags Drive's own
- * thumbnail (≈768px) rather than downloading full files — fast and cheap.
+ * model, and write a searchable index (assets/index.json) of the REUSABLE ones.
+ * Tags Drive's own thumbnail (≈768px) rather than downloading full files.
+ *
+ * First-level triage gate: the vision model judges `marketing_usable` (a generic,
+ * reuse-anywhere asset) vs one-off (dated promo, internal screenshot, low-value).
+ * Only usable assets get a full record in index.json and get embedded later — so
+ * the searchable index stays small even when the folder holds tens of thousands of
+ * one-off images. Every processed id is recorded in assets/seen.json (tiny stub +
+ * verdict) so incremental runs skip it and you keep an audit of what was rejected.
  *
  * Setup (one-time):
  *   1. GCP console → create a Service Account → make a JSON key.
@@ -17,10 +24,11 @@ import { REPO_ROOT } from "../agent/brand.js";
  *      export DRIVE_FOLDER_ID=<the folder id>   GEMINI_API_KEY=...
  *   4. npm run index:drive            (add --force to re-tag everything)
  *
- * Incremental: skips Drive ids already indexed unless --force.
+ * Incremental: skips Drive ids already processed (in seen.json) unless --force.
  */
 
 const INDEX = resolve(REPO_ROOT, "assets/index.json");
+const SEEN = resolve(REPO_ROOT, "assets/seen.json"); // triage ledger: every processed id + verdict (tiny stubs)
 const FOLDER = process.env.DRIVE_FOLDER_ID;
 
 async function main() {
@@ -32,6 +40,9 @@ async function main() {
   const token = (await client.getAccessToken()).token!;
 
   const index: Record<string, any> = existsSync(INDEX) ? JSON.parse(await readFile(INDEX, "utf8")) : {};
+  const seen: Record<string, any> = existsSync(SEEN) ? JSON.parse(await readFile(SEEN, "utf8")) : {};
+  // Grandfather: ids already in index.json count as processed even if seen.json predates them.
+  for (const k of Object.keys(index)) if (!seen[k]) seen[k] = { u: true, r: index[k].reusability ?? "reusable" };
 
   // Recurse: collect image files with their folder path.
   type Img = { id: string; name: string; mimeType: string; thumb?: string; web?: string; path: string };
@@ -65,32 +76,43 @@ async function main() {
     for (const i of images) byFolder[i.path || "/"] = (byFolder[i.path || "/"] ?? 0) + 1;
     for (const [f, n] of Object.entries(byFolder).sort((a, b) => b[1] - a[1]))
       console.log(`  ${n}\t${f}`);
-    const already = images.filter((i) => index[`drive:${i.id}`]).length;
-    console.log(`\n${images.length} images, ${already} already indexed, ${images.length - already} to tag. (preflight only; no tagging)`);
+    const already = images.filter((i) => seen[`drive:${i.id}`]).length;
+    console.log(`\n${images.length} images, ${already} already processed, ${images.length - already} to triage. (preflight only; no tagging)`);
     process.exit(0);
   }
 
   const CONC = Number(process.env.INDEX_CONCURRENCY ?? 5);
-  const todo = images.filter((img) => (force || !index[`drive:${img.id}`]) && img.thumb);
+  const todo = images.filter((img) => (force || !seen[`drive:${img.id}`]) && img.thumb);
   const skip = images.length - todo.length;
-  let done = 0;
+  let done = 0, kept = 0, rejected = 0;
   for (let i = 0; i < todo.length; i += CONC) {
     const batch = todo.slice(i, i + CONC);
     await Promise.all(batch.map(async (img) => {
+      const key = `drive:${img.id}`;
       try {
         const url = img.thumb!.replace(/=s\d+$/, "=s768");
         const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
         const bytes = Buffer.from(await res.arrayBuffer());
         const tags = await tagImage(bytes, "image/jpeg");
-        index[`drive:${img.id}`] = { name: img.name, source: "drive", driveId: img.id, driveUrl: img.web, folder: img.path, ...tags, indexed_at: new Date().toISOString() };
+        // First-level gate: only reusable assets earn a full record + later embedding.
+        seen[key] = { u: tags.marketing_usable, r: tags.reusability, n: img.name };
+        if (tags.marketing_usable) {
+          index[key] = { name: img.name, source: "drive", driveId: img.id, driveUrl: img.web, folder: img.path, ...tags, indexed_at: new Date().toISOString() };
+          kept++;
+        } else {
+          delete index[key]; // in case a prior run had kept it
+          rejected++;
+        }
       } catch (e) { process.stdout.write(`\n✗ ${img.name}: ${e instanceof Error ? e.message : e}\n`); }
     }));
     done += batch.length;
     await writeFile(INDEX, JSON.stringify(index, null, 2)); // checkpoint per batch
-    process.stdout.write(`tagged ${done}/${todo.length} (skipped ${skip})\r`);
+    await writeFile(SEEN, JSON.stringify(seen));
+    process.stdout.write(`triaged ${done}/${todo.length}  (kept ${kept}, rejected ${rejected}, skipped ${skip})\r`);
   }
   await writeFile(INDEX, JSON.stringify(index, null, 2));
-  console.log(`\nindexed ${done}, skipped ${skip}, total ${Object.keys(index).length} → assets/index.json`);
+  await writeFile(SEEN, JSON.stringify(seen));
+  console.log(`\ntriaged ${done}: kept ${kept} reusable, rejected ${rejected} one-off; skipped ${skip}. index has ${Object.keys(index).length} usable assets → assets/index.json`);
   process.exit(0);
 }
 main().catch((e) => { console.error(e); process.exit(1); });

@@ -1,8 +1,22 @@
 # Asset index — searchable catalog of marketing images
 
-`assets/index.json` maps each asset → AI-generated metadata (caption, category,
-tags, colors, objects, suggested_use) so Design Mark (and any agent) can find
+`assets/index.json` maps each asset → AI-generated metadata (caption, tags,
+colors, objects, suggested_use) so Design Mark (and any agent) can find
 the right image by description instead of digging through Drive.
+
+## First-level triage gate (keeps the index small)
+A marketing Drive can hold tens of thousands of images, but most are **one-offs**:
+ads locked to a specific promotion (baked-in price/sale date/coupon), internal or
+one-off screenshots, and low-value scratch files. Before anything is indexed, the
+vision model judges **`marketing_usable`** — is this a *generic, reuse-anywhere*
+asset a designer could drop into a NEW campaign as-is? Only usable assets get a
+full record in `index.json` and an embedding; everything else is recorded as a tiny
+stub in **`assets/seen.json`** (id → `{u, r, n}`) so incremental runs skip it and
+you keep an audit of what was rejected and why. Result: the searchable index stays
+in the low thousands even when the source folder is ~28k images.
+
+`reusability` buckets: `reusable` (kept) · `dated-promo` · `screenshot` ·
+`low-value` (rejected).
 
 ## Search
 ```

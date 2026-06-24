@@ -12,6 +12,9 @@ import { geminiFetch } from "../util/gemini-fetch.js";
 
 export interface AssetTags {
   caption: string;
+  reusability: string;
+  reuse_notes: string;
+  marketing_usable: boolean;
   subject_type: string;
   product: string;
   features: string[];
@@ -26,6 +29,13 @@ const SCHEMA = {
   type: "object",
   properties: {
     caption: { type: "string", description: "One concise sentence describing the image." },
+    reusability: {
+      type: "string",
+      enum: ["reusable", "dated-promo", "screenshot", "low-value"],
+      description: "reusable=a generic, reuse-anywhere building block (clean product/lifestyle/finished-project photo, polished feature UI, logo/icon/pattern/illustration) with no campaign-specific copy; dated-promo=a finished ad locked to one promotion (baked-in price, sale date, coupon, seasonal/event copy); screenshot=a one-off or internal UI/web/app capture, document, slide, email, or spreadsheet (NOT a polished marketing UI shot); low-value=blurry, low-res, duplicate, watermarked comp, WIP scratch, or not a deliberate brand asset.",
+    },
+    reuse_notes: { type: "string", description: "Brief reason for the reusability call — what makes it generic, or what locks it to a single use." },
+    marketing_usable: { type: "boolean", description: "TRUE only when reusability='reusable': a clean asset a designer could drop into a NEW campaign as-is. FALSE for dated-promo, one-off/internal screenshots, and low-value files." },
     subject_type: {
       type: "string",
       enum: ["hardware", "software-ui", "finished-project", "lifestyle", "packaging", "branding", "promo-graphic", "other"],
@@ -39,17 +49,24 @@ const SCHEMA = {
     has_text: { type: "boolean", description: "Does the image contain rendered text/copy?" },
     suggested_use: { type: "string", description: "Where a marketer would use this." },
   },
-  required: ["caption", "subject_type", "product", "features", "tags", "colors", "objects", "has_text", "suggested_use"],
+  required: ["caption", "reusability", "reuse_notes", "marketing_usable", "subject_type", "product", "features", "tags", "colors", "objects", "has_text", "suggested_use"],
 };
 
 const PROMPT =
-  "You are cataloguing a Glowforge marketing asset for a searchable library. Glowforge makes BOTH " +
+  "You are triaging a Glowforge marketing image for a searchable library of REUSABLE assets. Glowforge makes BOTH " +
   "hardware (laser cutter/engraver machines — product lines include Aura, Spark, Pro, Plus, Basic) AND " +
   "software (the Glowforge web/app design tool, with features like Smartfit auto-nesting, Magic Canvas / " +
-  "AI design, the catalog, and Print). Classify the image precisely with the schema — especially " +
-  "`subject_type` (distinguish a hardware machine shot from a software-ui screenshot from a finished " +
-  "laser-made project), `product` (name it if you can tell), and `features` (any software features shown). " +
-  "Use specific, natural search terms a marketer would type. Lowercase tags.";
+  "AI design, the catalog, and Print).\n\n" +
+  "FIRST decide reusability. The library only keeps generic, reuse-anywhere building blocks a designer could drop " +
+  "into a NEW campaign as-is: clean product photography, clean lifestyle/maker/finished-project photos, polished " +
+  "feature UI shots, and brand assets (logos, icons, patterns, illustrations). REJECT (marketing_usable=false) the " +
+  "one-offs that bloat the library: ads locked to a specific promotion (baked-in price, sale date, coupon, " +
+  "seasonal/event copy), internal or one-off screenshots/documents/slides/spreadsheets, and low-value files " +
+  "(blurry, low-res, duplicate, watermarked comps, WIP scratch). When unsure, prefer 'reusable' only if the image " +
+  "would genuinely be useful months from now for a different campaign.\n\n" +
+  "THEN classify precisely — `subject_type` (distinguish a hardware machine shot from a software-ui screenshot from " +
+  "a finished laser-made project), `product`, and `features`. Use specific, natural search terms a marketer would " +
+  "type. Lowercase tags.";
 
 /** Tag a single image (raw bytes). Returns structured metadata. */
 export async function tagImage(bytes: Buffer, mimeType: string): Promise<AssetTags> {
