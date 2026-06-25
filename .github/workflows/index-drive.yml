@@ -22,7 +22,7 @@ on:
         required: true
         default: "2000"
       force:
-        description: "Re-triage already-indexed images too"
+        description: "Re-tag from scratch, ignoring saved progress. Only for a SMALL folder that finishes in one run — for a rubric change on a big folder, leave this OFF and just run normally (it auto-re-triages stale gate versions, advancing each run)."
         type: boolean
         default: false
       run_embed:

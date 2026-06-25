@@ -10,6 +10,10 @@ import { Buffer } from "node:buffer";
 
 import { geminiFetch } from "../util/gemini-fetch.js";
 
+/** Bump when the triage rubric changes — index-drive re-tags any asset stamped with
+ *  an older gate version, in advancing batches (no --force needed). */
+export const GATE_VERSION = 2;
+
 export interface AssetTags {
   caption: string;
   reusability: string;
@@ -32,10 +36,10 @@ const SCHEMA = {
     reusability: {
       type: "string",
       enum: ["reusable", "dated-promo", "screenshot", "low-value"],
-      description: "reusable=a generic, reuse-anywhere building block (clean product/lifestyle/finished-project photo, polished feature UI, logo/icon/pattern/illustration) with no campaign-specific copy; dated-promo=a finished ad locked to one promotion (baked-in price, sale date, coupon, seasonal/event copy); screenshot=a one-off or internal UI/web/app capture, document, slide, email, or spreadsheet (NOT a polished marketing UI shot); low-value=blurry, low-res, duplicate, watermarked comp, WIP scratch, or not a deliberate brand asset.",
+      description: "reusable=a generic, reuse-anywhere building block (clean product/lifestyle/finished-project photo, a CLEAN/presentable app or feature UI shot, logo/icon/pattern/illustration) with no campaign-specific copy; dated-promo=a finished ad locked to one promotion (baked-in price, sale date, coupon, seasonal/event copy); screenshot=ONLY a throwaway/internal screen capture (error or empty state, half-cropped or cluttered window, internal dashboard, document, slide, email, spreadsheet, or low-quality grab) — a nice-looking product/app UI is 'reusable', NOT a screenshot; low-value=blurry, low-res, duplicate, watermarked comp, WIP scratch, or not a deliberate brand asset.",
     },
     reuse_notes: { type: "string", description: "Brief reason for the reusability call — what makes it generic, or what locks it to a single use." },
-    marketing_usable: { type: "boolean", description: "TRUE only when reusability='reusable': a clean asset a designer could drop into a NEW campaign as-is. FALSE for dated-promo, one-off/internal screenshots, and low-value files." },
+    marketing_usable: { type: "boolean", description: "TRUE when reusability='reusable' — a clean asset a designer could drop into a NEW campaign as-is, INCLUDING a polished app/feature UI shot. FALSE for dated-promo, throwaway/internal screenshots, and low-value files." },
     subject_type: {
       type: "string",
       enum: ["hardware", "software-ui", "finished-project", "lifestyle", "packaging", "branding", "promo-graphic", "other"],
@@ -58,13 +62,17 @@ const PROMPT =
   "software (the Glowforge web/app design tool, with features like Smartfit auto-nesting, Magic Canvas / " +
   "AI design, the catalog, and Print).\n\n" +
   "FIRST decide reusability. The library only keeps generic, reuse-anywhere building blocks a designer could drop " +
-  "into a NEW campaign as-is: clean product photography, clean lifestyle/maker/finished-project photos, polished " +
-  "feature UI shots, and brand assets (logos, icons, patterns, illustrations). REJECT (marketing_usable=false) the " +
-  "one-offs that bloat the library: ads locked to a specific promotion (baked-in price, sale date, coupon, " +
-  "seasonal/event copy), internal or one-off screenshots/documents/slides/spreadsheets, and low-value files " +
-  "(blurry, low-res, duplicate, watermarked comps, WIP scratch). When unsure, prefer 'reusable' only if the image " +
-  "would genuinely be useful months from now for a different campaign.\n\n" +
-  "THEN classify precisely — `subject_type` (distinguish a hardware machine shot from a software-ui screenshot from " +
+  "into a NEW campaign as-is: clean product photography, clean lifestyle/maker/finished-project photos, and brand " +
+  "assets (logos, icons, patterns, illustrations). REJECT (marketing_usable=false) the one-offs that bloat the " +
+  "library: ads locked to a specific promotion (baked-in price, sale date, coupon, seasonal/event copy), and " +
+  "low-value files (blurry, low-res, duplicate, watermarked comps, WIP scratch).\n\n" +
+  "IMPORTANT — software/app UI is a PRODUCT, not junk. Glowforge's app is something we market, so a CLEAN, " +
+  "presentable shot of the app or a feature (the design canvas, Magic Canvas / AI design, Smartfit, the catalog, " +
+  "a feature highlight, an in-app design) IS reusable: set reusability='reusable' and subject_type='software-ui'. " +
+  "Only use reusability='screenshot' for genuinely throwaway captures — error/empty states, half-cropped or " +
+  "cluttered windows, internal dashboards, documents, spreadsheets, emails, slides, or low-quality grabs. A " +
+  "nice-looking product/app UI is an asset to KEEP, not a screenshot to reject.\n\n" +
+  "THEN classify precisely — `subject_type` (distinguish a hardware machine shot from a software-ui app shot from " +
   "a finished laser-made project), `product`, and `features`. Use specific, natural search terms a marketer would " +
   "type. Lowercase tags.";
 

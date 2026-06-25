@@ -2,7 +2,7 @@ import { writeFile, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { google } from "googleapis";
-import { tagImage } from "../agent/tools/vision-tag.js";
+import { tagImage, GATE_VERSION } from "../agent/tools/vision-tag.js";
 import { REPO_ROOT } from "../agent/brand.js";
 
 /**
@@ -24,7 +24,10 @@ import { REPO_ROOT } from "../agent/brand.js";
  *      export DRIVE_FOLDER_ID=<the folder id>   GEMINI_API_KEY=...
  *   4. npm run index:drive            (add --force to re-tag everything)
  *
- * Incremental: skips Drive ids already processed (in seen.json) unless --force.
+ * Incremental: skips Drive ids already processed (in seen.json) at the current gate
+ * version. When the triage rubric changes, bump GATE_VERSION in vision-tag.ts — then
+ * a normal run re-triages every stale-version asset in advancing --limit batches (no
+ * --force needed; raw --force + --limit would re-do the same first N every run).
  * Scan-once: the recursive Drive enumeration is cached to assets/drive-listing.json
  * on the first run and reused thereafter; pass --rescan to re-walk Drive (new files
  * added, or expired thumbnail links).
@@ -96,8 +99,10 @@ async function main() {
     for (const i of images) byFolder[i.path || "/"] = (byFolder[i.path || "/"] ?? 0) + 1;
     for (const [f, n] of Object.entries(byFolder).sort((a, b) => b[1] - a[1]))
       console.log(`  ${n}\t${f}`);
-    const already = images.filter((i) => seen[`drive:${i.id}`]).length;
-    console.log(`\n${images.length} images, ${already} already processed, ${images.length - already} to triage. (preflight only; no tagging)`);
+    const current = images.filter((i) => seen[`drive:${i.id}`]?.gv === GATE_VERSION).length;
+    const stale = images.filter((i) => { const s = seen[`drive:${i.id}`]; return s && s.gv !== GATE_VERSION; }).length;
+    const fresh = images.length - current - stale;
+    console.log(`\n${images.length} images: ${current} up-to-date (gate v${GATE_VERSION}), ${stale} need re-triage (older rubric), ${fresh} new. (preflight only; no tagging)`);
     process.exit(0);
   }
 
@@ -107,7 +112,14 @@ async function main() {
   // processed ids are in seen.json and skipped.
   const limArg = process.argv.indexOf("--limit");
   const limit = Number(limArg >= 0 ? process.argv[limArg + 1] : process.env.LIMIT ?? 0) || 0;
-  const todoAll = images.filter((img) => (force || !seen[`drive:${img.id}`]) && img.thumb);
+  // Process new images, anything tagged under an OLDER gate version (rubric changed),
+  // or everything if --force. The gate-version check is what makes a rubric update
+  // re-triage in advancing batches — re-tagged items get the current version and drop
+  // out of the to-do list, so the next run moves forward (unlike raw --force + --limit).
+  const todoAll = images.filter((img) => {
+    const s = seen[`drive:${img.id}`];
+    return (force || !s || s.gv !== GATE_VERSION) && img.thumb;
+  });
   const todo = limit > 0 ? todoAll.slice(0, limit) : todoAll;
   const skip = images.length - todoAll.length;
   if (limit > 0 && todoAll.length > todo.length)
@@ -123,7 +135,7 @@ async function main() {
         const bytes = Buffer.from(await res.arrayBuffer());
         const tags = await tagImage(bytes, "image/jpeg");
         // First-level gate: only reusable assets earn a full record + later embedding.
-        seen[key] = { u: tags.marketing_usable, r: tags.reusability, n: img.name };
+        seen[key] = { u: tags.marketing_usable, r: tags.reusability, n: img.name, gv: GATE_VERSION };
         if (tags.marketing_usable) {
           index[key] = { name: img.name, source: "drive", driveId: img.id, driveUrl: img.web, folder: img.path, ...tags, indexed_at: new Date().toISOString() };
           kept++;
