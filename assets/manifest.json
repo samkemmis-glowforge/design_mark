@@ -2,7 +2,7 @@
   "repo": "samkemmis-glowforge/design_mark",
   "ref": "claude/gifted-davinci-YFc85",
   "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/",
-  "generated": "2026-06-25T16:33:32Z",
+  "generated": "2026-06-25T16:53:59Z",
   "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/<path>",
   "groups": {
     "marks_raster": {
@@ -492,31 +492,79 @@
     "social_ready": {
       "description": "Finished, ready-to-post social graphics (1:1 = 1080x1080, 4:5 = 1080x1350). Fetch by URL and post directly \u2014 no editing required.",
       "dir": "assets/social",
-      "count": 12,
+      "count": 20,
       "files": [
         {
-          "name": "laser-191.png",
-          "path": "assets/social/laser-191.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-191.png",
-          "bytes": 2011181
+          "name": "laser-bubbles-191.png",
+          "path": "assets/social/laser-bubbles-191.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-191.png",
+          "bytes": 2616544
         },
         {
-          "name": "laser-1x1.png",
-          "path": "assets/social/laser-1x1.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-1x1.png",
-          "bytes": 2797515
+          "name": "laser-bubbles-1x1.png",
+          "path": "assets/social/laser-bubbles-1x1.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-1x1.png",
+          "bytes": 3892175
         },
         {
-          "name": "laser-4x5.png",
-          "path": "assets/social/laser-4x5.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-4x5.png",
-          "bytes": 3559315
+          "name": "laser-bubbles-4x5.png",
+          "path": "assets/social/laser-bubbles-4x5.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-4x5.png",
+          "bytes": 4407706
         },
         {
-          "name": "laser-9x16.png",
-          "path": "assets/social/laser-9x16.png",
-          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-9x16.png",
-          "bytes": 4423646
+          "name": "laser-bubbles-9x16.png",
+          "path": "assets/social/laser-bubbles-9x16.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-9x16.png",
+          "bytes": 5438351
+        },
+        {
+          "name": "laser-chars-191.png",
+          "path": "assets/social/laser-chars-191.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-chars-191.png",
+          "bytes": 2592083
+        },
+        {
+          "name": "laser-chars-1x1.png",
+          "path": "assets/social/laser-chars-1x1.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-chars-1x1.png",
+          "bytes": 3926103
+        },
+        {
+          "name": "laser-chars-4x5.png",
+          "path": "assets/social/laser-chars-4x5.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-chars-4x5.png",
+          "bytes": 4507521
+        },
+        {
+          "name": "laser-chars-9x16.png",
+          "path": "assets/social/laser-chars-9x16.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-chars-9x16.png",
+          "bytes": 5574396
+        },
+        {
+          "name": "laser-design-191.png",
+          "path": "assets/social/laser-design-191.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-design-191.png",
+          "bytes": 2449467
+        },
+        {
+          "name": "laser-design-1x1.png",
+          "path": "assets/social/laser-design-1x1.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-design-1x1.png",
+          "bytes": 3540259
+        },
+        {
+          "name": "laser-design-4x5.png",
+          "path": "assets/social/laser-design-4x5.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-design-4x5.png",
+          "bytes": 4080691
+        },
+        {
+          "name": "laser-design-9x16.png",
+          "path": "assets/social/laser-design-9x16.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-design-9x16.png",
+          "bytes": 4972822
         },
         {
           "name": "premium-c-outcome-191.png",
