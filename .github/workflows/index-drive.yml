@@ -52,6 +52,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: claude/gifted-davinci-YFc85
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -81,7 +82,18 @@ jobs:
           git add assets/index.json assets/seen.json assets/embeddings.json
           if git diff --staged --quiet; then
             echo "No index changes to commit."
-          else
-            git commit -m "Index marketing Drive via Actions (folder ${{ github.event.inputs.folder_id }})"
-            git push origin HEAD:claude/gifted-davinci-YFc85
+            exit 0
           fi
+          git commit -m "Index marketing Drive via Actions (folder ${{ github.event.inputs.folder_id }})"
+          # Rebase onto any commits that landed on the branch mid-run, then push.
+          # Retry to ride out a concurrent push (e.g. someone editing the repo).
+          for i in 1 2 3 4 5; do
+            git fetch origin claude/gifted-davinci-YFc85 || true
+            if git rebase origin/claude/gifted-davinci-YFc85 && \
+               git push origin HEAD:claude/gifted-davinci-YFc85; then
+              echo "pushed"; exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "push race — retrying ($i)"; sleep $((i * 5))
+          done
+          echo "failed to push index after retries"; exit 1
