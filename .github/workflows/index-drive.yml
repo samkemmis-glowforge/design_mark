@@ -79,7 +79,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/index.json assets/seen.json assets/embeddings.json
+          git add assets/index.json assets/seen.json assets/embeddings.json assets/drive-listing.json
           if git diff --staged --quiet; then
             echo "No index changes to commit."
             exit 0

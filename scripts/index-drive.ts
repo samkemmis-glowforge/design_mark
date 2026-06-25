@@ -25,11 +25,17 @@ import { REPO_ROOT } from "../agent/brand.js";
  *   4. npm run index:drive            (add --force to re-tag everything)
  *
  * Incremental: skips Drive ids already processed (in seen.json) unless --force.
+ * Scan-once: the recursive Drive enumeration is cached to assets/drive-listing.json
+ * on the first run and reused thereafter; pass --rescan to re-walk Drive (new files
+ * added, or expired thumbnail links).
  */
 
 const INDEX = resolve(REPO_ROOT, "assets/index.json");
 const SEEN = resolve(REPO_ROOT, "assets/seen.json"); // triage ledger: every processed id + verdict (tiny stubs)
+const LISTING = resolve(REPO_ROOT, "assets/drive-listing.json"); // cached folder enumeration (scan once, reuse)
 const FOLDER = process.env.DRIVE_FOLDER_ID;
+
+type Img = { id: string; name: string; mimeType: string; thumb?: string; web?: string; path: string };
 
 async function main() {
   if (!FOLDER) { console.error("set DRIVE_FOLDER_ID"); process.exit(1); }
@@ -44,32 +50,46 @@ async function main() {
   // Grandfather: ids already in index.json count as processed even if seen.json predates them.
   for (const k of Object.keys(index)) if (!seen[k]) seen[k] = { u: true, r: index[k].reusability ?? "reusable" };
 
-  // Recurse: collect image files with their folder path.
-  type Img = { id: string; name: string; mimeType: string; thumb?: string; web?: string; path: string };
-  const images: Img[] = [];
-  let folders = 0;
-  async function walk(folderId: string, path: string) {
-    folders++;
-    process.stdout.write(`scanning [${folders}] ${path || "/"}  (${images.length} images so far)\n`);
-    let pageToken: string | undefined;
-    do {
-      const r = await drive.files.list({
-        q: `'${folderId}' in parents and trashed=false`,
-        fields: "nextPageToken, files(id,name,mimeType,thumbnailLink,webViewLink)",
-        pageSize: 1000, pageToken,
-        supportsAllDrives: true, includeItemsFromAllDrives: true,
-      });
-      const kids = r.data.files ?? [];
-      // images first (cheap), then recurse subfolders
-      for (const f of kids) if (f.mimeType?.startsWith("image/"))
-        images.push({ id: f.id!, name: f.name!, mimeType: f.mimeType!, thumb: f.thumbnailLink ?? undefined, web: f.webViewLink ?? undefined, path });
-      for (const f of kids) if (f.mimeType === "application/vnd.google-apps.folder")
-        await walk(f.id!, `${path}/${f.name}`);
-      pageToken = r.data.nextPageToken ?? undefined;
-    } while (pageToken);
+  // Folder enumeration: scan once, then reuse the cached listing. The recursive
+  // Drive walk over a big folder is hundreds of API calls; caching it means later
+  // runs (to process the next batch) go straight to tagging. --rescan refreshes it
+  // (e.g. to pick up newly-added Drive files, or if cached thumbnail links expire).
+  const rescan = process.argv.includes("--rescan");
+  const listingCache: Record<string, { scanned_at: string; images: Img[] }> =
+    existsSync(LISTING) ? JSON.parse(await readFile(LISTING, "utf8")) : {};
+
+  let images: Img[];
+  if (!rescan && listingCache[FOLDER]?.images?.length) {
+    images = listingCache[FOLDER].images;
+    console.log(`using cached listing: ${images.length} images (scanned ${listingCache[FOLDER].scanned_at}). Pass --rescan to re-walk Drive.`);
+  } else {
+    images = [];
+    let folders = 0;
+    const walk = async (folderId: string, path: string): Promise<void> => {
+      folders++;
+      process.stdout.write(`scanning [${folders}] ${path || "/"}  (${images.length} images so far)\n`);
+      let pageToken: string | undefined;
+      do {
+        const r = await drive.files.list({
+          q: `'${folderId}' in parents and trashed=false`,
+          fields: "nextPageToken, files(id,name,mimeType,thumbnailLink,webViewLink)",
+          pageSize: 1000, pageToken,
+          supportsAllDrives: true, includeItemsFromAllDrives: true,
+        });
+        const kids = r.data.files ?? [];
+        // images first (cheap), then recurse subfolders
+        for (const f of kids) if (f.mimeType?.startsWith("image/"))
+          images.push({ id: f.id!, name: f.name!, mimeType: f.mimeType!, thumb: f.thumbnailLink ?? undefined, web: f.webViewLink ?? undefined, path });
+        for (const f of kids) if (f.mimeType === "application/vnd.google-apps.folder")
+          await walk(f.id!, `${path}/${f.name}`);
+        pageToken = r.data.nextPageToken ?? undefined;
+      } while (pageToken);
+    };
+    await walk(FOLDER, "");
+    listingCache[FOLDER] = { scanned_at: new Date().toISOString(), images };
+    await writeFile(LISTING, JSON.stringify(listingCache));
+    console.log(`\nscanned ${folders} folders — found ${images.length} images (cached → assets/drive-listing.json)`);
   }
-  await walk(FOLDER, "");
-  console.log(`\nscanned ${folders} folders — found ${images.length} images`);
 
   if (process.argv.includes("--count")) {
     const byFolder: Record<string, number> = {};
