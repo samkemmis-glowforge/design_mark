@@ -2,7 +2,7 @@
   "repo": "samkemmis-glowforge/design_mark",
   "ref": "claude/gifted-davinci-YFc85",
   "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/",
-  "generated": "2026-06-25T19:39:12Z",
+  "generated": "2026-06-25T20:15:48Z",
   "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/<path>",
   "groups": {
     "marks_raster": {
@@ -492,7 +492,7 @@
     "social_ready": {
       "description": "Finished, ready-to-post social graphics (1:1 = 1080x1080, 4:5 = 1080x1350). Fetch by URL and post directly \u2014 no editing required.",
       "dir": "assets/social",
-      "count": 22,
+      "count": 23,
       "files": [
         {
           "name": "email-premium-lab-2x1.png",
@@ -625,6 +625,12 @@
           "path": "assets/social/premium-c-real.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/premium-c-real.png",
           "bytes": 3861103
+        },
+        {
+          "name": "proofgrade-1x1.png",
+          "path": "assets/social/proofgrade-1x1.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/proofgrade-1x1.png",
+          "bytes": 1397899
         }
       ]
     }
