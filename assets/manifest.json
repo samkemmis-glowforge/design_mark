@@ -2,7 +2,7 @@
   "repo": "samkemmis-glowforge/design_mark",
   "ref": "claude/gifted-davinci-YFc85",
   "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/",
-  "generated": "2026-06-25T16:53:59Z",
+  "generated": "2026-06-25T17:09:41Z",
   "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/<path>",
   "groups": {
     "marks_raster": {
@@ -498,25 +498,25 @@
           "name": "laser-bubbles-191.png",
           "path": "assets/social/laser-bubbles-191.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-191.png",
-          "bytes": 2616544
+          "bytes": 2890227
         },
         {
           "name": "laser-bubbles-1x1.png",
           "path": "assets/social/laser-bubbles-1x1.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-1x1.png",
-          "bytes": 3892175
+          "bytes": 4113007
         },
         {
           "name": "laser-bubbles-4x5.png",
           "path": "assets/social/laser-bubbles-4x5.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-4x5.png",
-          "bytes": 4407706
+          "bytes": 4780826
         },
         {
           "name": "laser-bubbles-9x16.png",
           "path": "assets/social/laser-bubbles-9x16.png",
           "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/laser-bubbles-9x16.png",
-          "bytes": 5438351
+          "bytes": 6229989
         },
         {
           "name": "laser-chars-191.png",
