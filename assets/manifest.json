@@ -2,7 +2,7 @@
   "repo": "samkemmis-glowforge/design_mark",
   "ref": "claude/gifted-davinci-YFc85",
   "base_url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/",
-  "generated": "2026-06-25T17:09:41Z",
+  "generated": "2026-06-25T19:39:12Z",
   "url_pattern": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/<path>",
   "groups": {
     "marks_raster": {
@@ -492,8 +492,20 @@
     "social_ready": {
       "description": "Finished, ready-to-post social graphics (1:1 = 1080x1080, 4:5 = 1080x1350). Fetch by URL and post directly \u2014 no editing required.",
       "dir": "assets/social",
-      "count": 20,
+      "count": 22,
       "files": [
+        {
+          "name": "email-premium-lab-2x1.png",
+          "path": "assets/social/email-premium-lab-2x1.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/email-premium-lab-2x1.png",
+          "bytes": 1944752
+        },
+        {
+          "name": "email-premium-lab-3x1.png",
+          "path": "assets/social/email-premium-lab-3x1.png",
+          "url": "https://raw.githubusercontent.com/samkemmis-glowforge/design_mark/claude/gifted-davinci-YFc85/assets/social/email-premium-lab-3x1.png",
+          "bytes": 1379358
+        },
         {
           "name": "laser-bubbles-191.png",
           "path": "assets/social/laser-bubbles-191.png",
