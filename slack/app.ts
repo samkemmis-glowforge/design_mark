@@ -33,41 +33,54 @@ function requireEnv(): { botToken: string; appToken: string } {
   return { botToken: botToken!, appToken: appToken! };
 }
 
-/** Build a ThreadChannel bound to a specific channel + thread. Supports an editable
- *  placeholder: postPlaceholder() posts the "On it" message; the FIRST postText() edits
- *  that message in place, and later postText() calls post new messages as normal. */
+/** Claude writes standard markdown, but Slack mrkdwn differs — convert the common cases
+ *  so **bold**, __bold__, ### headings, and [text](url) links render instead of showing raw. */
+function toSlackMrkdwn(s: string): string {
+  return s
+    .replace(/\*\*\*(.+?)\*\*\*/g, "*_$1_*")               // ***bold italic***
+    .replace(/\*\*(.+?)\*\*/g, "*$1*")                      // **bold** -> *bold*
+    .replace(/__(.+?)__/g, "*$1*")                          // __bold__ -> *bold*
+    .replace(/^\s{0,3}#{1,6}\s+(.+?)\s*$/gm, "*$1*")        // # Heading -> *Heading*
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, "<$2|$1>"); // [text](url) -> <url|text>
+}
+
+/** Build a ThreadChannel bound to a specific channel + thread (threadTs undefined = post
+ *  at the channel/DM top level). Supports an editable placeholder: postPlaceholder() posts
+ *  the "On it" message; the FIRST postText() edits it in place, later calls post anew. */
 function makeChannel(
   client: WebClient,
   channel: string,
-  threadTs: string,
+  threadTs: string | undefined,
 ): ThreadChannel & { postPlaceholder(text: string): Promise<void> } {
   let placeholderTs: string | null = null;
   let placeholderReady: Promise<void> | null = null;
   return {
     postPlaceholder(text: string) {
       placeholderReady = client.chat
-        .postMessage({ channel, thread_ts: threadTs, text, unfurl_links: false })
+        .postMessage({ channel, thread_ts: threadTs, text: toSlackMrkdwn(text), unfurl_links: false })
         .then((r) => { placeholderTs = (r.ts as string) ?? null; });
       return placeholderReady;
     },
     async postText(text: string) {
+      const body = toSlackMrkdwn(text);
       if (placeholderReady) await placeholderReady; // ensure we know the placeholder's ts
       if (placeholderTs) {
         const ts = placeholderTs;
         placeholderTs = null; // consume it — only the first reply replaces the placeholder
-        await client.chat.update({ channel, ts, text });
+        await client.chat.update({ channel, ts, text: body });
         return;
       }
-      await client.chat.postMessage({ channel, thread_ts: threadTs, text, unfurl_links: false });
+      await client.chat.postMessage({ channel, thread_ts: threadTs, text: body, unfurl_links: false });
     },
     async uploadImage(path: string, comment: string) {
-      await client.files.uploadV2({
+      const args: Record<string, unknown> = {
         channel_id: channel,
-        thread_ts: threadTs,
         file: path,
         filename: path.split("/").pop() ?? "asset.png",
-        initial_comment: comment,
-      });
+        initial_comment: toSlackMrkdwn(comment),
+      };
+      if (threadTs) args.thread_ts = threadTs;
+      await client.files.uploadV2(args as unknown as Parameters<typeof client.files.uploadV2>[0]);
     },
   };
 }
@@ -90,9 +103,10 @@ async function main() {
   // channel:threadTs -> session
   const sessions = new Map<string, ThreadSession>();
 
-  function routeMessage(client: WebClient, channel: string, threadTs: string, text: string) {
+  // key -> session. For DMs the key is the channel (one ongoing conversation, so context
+  // survives across top-level messages); for channel @-mentions it's channel:threadTs.
+  function routeMessage(client: WebClient, key: string, channel: string, threadTs: string | undefined, text: string) {
     if (!text) return;
-    const key = `${channel}:${threadTs}`;
     let session = sessions.get(key);
     if (session) {
       session.handleUserMessage(text);
@@ -120,13 +134,16 @@ async function main() {
     };
     if (m.subtype || m.bot_id) return;
     if (m.channel_type !== "im") return; // channels use @-mentions
-    routeMessage(client as WebClient, m.channel, m.thread_ts ?? m.ts, (m.text ?? "").trim());
+    // DM = one continuous session keyed by channel; reply at the DM top level (no thread),
+    // so sequential messages keep full context instead of each starting fresh.
+    routeMessage(client as WebClient, `dm:${m.channel}`, m.channel, undefined, (m.text ?? "").trim());
   });
 
-  // @-mentions in channels.
+  // @-mentions in channels — one session per thread.
   app.event("app_mention", async ({ event, client }) => {
     const e = event as { text?: string; ts: string; thread_ts?: string; channel: string };
-    routeMessage(client as WebClient, e.channel, e.thread_ts ?? e.ts, stripMention(e.text ?? ""));
+    const threadTs = e.thread_ts ?? e.ts;
+    routeMessage(client as WebClient, `${e.channel}:${threadTs}`, e.channel, threadTs, stripMention(e.text ?? ""));
   });
 
   startHealthListener(); // satisfy Cloud Run's $PORT startup check
