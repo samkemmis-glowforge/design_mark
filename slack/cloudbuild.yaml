@@ -1,0 +1,6 @@
+# Build the Slack-bot image from the named Dockerfile (Dockerfile.slack).
+# Invoked by slack/deploy_cloud_run.sh via: gcloud builds submit --config slack/cloudbuild.yaml
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "Dockerfile.slack", "-t", "${_IMAGE}", "."]
+images: ["${_IMAGE}"]

@@ -1,6 +1,15 @@
+import { createServer } from "node:http";
 import { App, LogLevel } from "@slack/bolt";
 import type { WebClient } from "@slack/web-api";
 import { ThreadSession, type ThreadChannel } from "./session.js";
+
+/** Socket Mode binds no HTTP port, but Cloud Run (and most PaaS) require the container
+ *  to listen on $PORT or it's killed at startup. Expose a tiny health endpoint. */
+function startHealthListener(): void {
+  const port = Number(process.env.PORT ?? 8080);
+  createServer((_req, res) => { res.writeHead(200, { "content-type": "text/plain" }); res.end("ok"); })
+    .listen(port, () => console.log(`health listener on :${port}`));
+}
 
 /**
  * Slack host for the Glowforge design agent (Bolt + Socket Mode — no public URL).
@@ -96,6 +105,7 @@ async function main() {
     routeMessage(client as WebClient, e.channel, e.thread_ts ?? e.ts, stripMention(e.text ?? ""));
   });
 
+  startHealthListener(); // satisfy Cloud Run's $PORT startup check
   await app.start();
   console.log("⚡ Glowforge design agent is running (Socket Mode). DM the bot or @-mention it.");
 }
