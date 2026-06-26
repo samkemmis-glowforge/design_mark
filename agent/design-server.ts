@@ -5,6 +5,8 @@ import { fetchReferences, type ReferenceKind } from "./tools/fetch-references.js
 import { generateImage, type AspectRatio } from "./tools/generate-image.js";
 import { renderSvg } from "./tools/render-svg.js";
 import { approveAsset } from "./tools/approve-asset.js";
+import { fetchImage } from "./tools/fetch-image.js";
+import { saveToDrive } from "./tools/save-to-drive.js";
 import { renderCanvaTemplate, getCanvaTemplateFields, handoffToCanva } from "./tools/canva-template.js";
 import { resolvePreset, presetCatalog } from "./presets.js";
 import { listTemplates } from "../templates/index.js";
@@ -32,6 +34,8 @@ export const DESIGN_TOOL_NAMES = [
   "mcp__design__render_svg",
   "mcp__design__generate_image",
   "mcp__design__fetch_references",
+  "mcp__design__fetch_image",
+  "mcp__design__save_to_drive",
   "mcp__design__approve_asset",
   "mcp__design__canva_template",
   "mcp__design__canva_template_fields",
@@ -181,6 +185,46 @@ export function buildDesignServer(transports: DesignHostTransports) {
     },
   );
 
+  const fetchImageTool = tool(
+    "fetch_image",
+    "Download an image the human gave you as a Google Drive link/ID (or any direct http(s) image URL) onto local " +
+      "disk, so render_template/render_svg/generate_image can use it. Returns the local path. Drive files shared " +
+      "'Anyone with the link' work with no setup; restricted files need a service account configured. Use this " +
+      "whenever a brief includes a Drive link or image URL — don't tell the human you can't reach Drive.",
+    {
+      source: z.string().describe("A Google Drive share link or file id, or a direct https image URL."),
+      name: z.string().optional().describe("Optional short name hint for the saved file."),
+    },
+    async (args) => {
+      try {
+        const r = await fetchImage(args.source, args.name ?? "incoming");
+        return text(`Downloaded → ${r.path} (${r.mime}, ${(r.bytes / 1024).toFixed(0)}KB). Use this path as the image input to a render/generate tool.`);
+      } catch (err) {
+        return text(`FETCH FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
+  const saveToDriveTool = tool(
+    "save_to_drive",
+    "Upload a finished local asset to Google Drive and return its shareable link. Requires a service account " +
+      "(GOOGLE_APPLICATION_CREDENTIALS) and the target folder shared with it as Editor; folder defaults to " +
+      "DRIVE_UPLOAD_FOLDER_ID. Use when the human asks to save/export a final to Drive.",
+    {
+      path: z.string().describe("Local path of the asset to upload (e.g. an approved PNG)."),
+      folderId: z.string().optional().describe("Drive folder id to upload into; defaults to DRIVE_UPLOAD_FOLDER_ID."),
+      name: z.string().optional().describe("Optional filename to use in Drive."),
+    },
+    async (args) => {
+      try {
+        const r = await saveToDrive(args.path, { folderId: args.folderId, name: args.name });
+        return text(`Uploaded to Drive: ${r.name} → ${r.link}`);
+      } catch (err) {
+        return text(`DRIVE UPLOAD FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
   const approveAssetTool = tool(
     "approve_asset",
     "Mark an asset approved: moves it from output/ (scratch) into approved/ (finals). " +
@@ -285,6 +329,8 @@ export function buildDesignServer(transports: DesignHostTransports) {
       renderSvgTool,
       generateImageTool,
       fetchReferencesTool,
+      fetchImageTool,
+      saveToDriveTool,
       approveAssetTool,
       canvaTemplateFieldsTool,
       canvaTemplateTool,

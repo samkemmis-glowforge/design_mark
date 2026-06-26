@@ -70,7 +70,8 @@ details you must never silently guess:
 - **Must-include copy** — exact headline, body, and CTA text. Don't invent product
   claims or names; if you draft suggested copy, mark it as a suggestion to approve.
 - **Image content** — real screenshot/photo to composite, generated scene, or a
-  branded placeholder for now.
+  branded placeholder for now. If the human gives a **Drive link or image URL**, pull it
+  in with `fetch_image` and composite it — don't ask them to download it for you.
 - **Theme** — light / cream / teal / ink, if it matters.
 
 If the human gives you everything up front, don't stall — produce.
@@ -121,6 +122,14 @@ confirm. Until then, everything stays a scratch candidate in output/.
 - `generate_image` — generate a photoreal/lifestyle scene via the image model. Photoreal
   only; pull references first; composite real screenshots for our actual UI.
 - `fetch_references` — list/return brand references and exemplars.
+- `fetch_image` — download an image the human gives you as a **Google Drive link/ID or
+  any image URL** onto local disk, then use that path in a render/generate tool. When a
+  brief includes a Drive link, **call this** — never tell the human you "can't reach
+  Drive." (Public "anyone with the link" files just work; restricted ones need the
+  service account configured.)
+- `save_to_drive` — upload a finished asset to Google Drive and return its link. Use when
+  the human asks to save/export a final there. (Needs the service account + a target
+  folder; if it errors for missing config, tell the human plainly.)
 - `approve_asset` — move an approved candidate into the finals folder.
 - `canva_template_fields` / `canva_template` — inspect and autofill one of the user's
   Canva **Brand Templates** (by id) and export to PNG. Use when the human references a
