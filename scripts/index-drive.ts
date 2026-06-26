@@ -127,26 +127,48 @@ async function main() {
   // or everything if --force. The gate-version check is what makes a rubric update
   // re-triage in advancing batches — re-tagged items get the current version and drop
   // out of the to-do list, so the next run moves forward (unlike raw --force + --limit).
+  const RETRY_CAP = 3; // re-attempt errored images a few times (e.g. after a fix), then give up
   const todoAll = images.filter((img) => {
     const s = seen[`drive:${img.id}`];
-    return (force || !s || s.gv !== GATE_VERSION) && img.thumb;
+    const stale = !s || s.gv !== GATE_VERSION;
+    const retryErr = s && s.r === "error" && (s.errAttempts ?? 0) < RETRY_CAP;
+    return (force || stale || retryErr) && img.thumb;
   });
   const todo = limit > 0 ? todoAll.slice(0, limit) : todoAll;
   const skip = images.length - todoAll.length;
   if (limit > 0 && todoAll.length > todo.length)
     console.log(`limiting to ${todo.length} of ${todoAll.length} remaining this run (re-run to continue)`);
+  // Load a thumbnail's bytes + real MIME. Drive thumbnailLinks are short-lived signed
+  // URLs, so a cached one (from drive-listing.json) often expires — on any failure we
+  // fetch a FRESH thumbnailLink via the API and retry once.
+  const loadThumb = async (img: Img): Promise<{ bytes: Buffer; mime: string }> => {
+    const grab = async (thumb: string) => {
+      const res = await fetch(thumb.replace(/=s\d+$/, "=s768"), { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(`thumbnail HTTP ${res.status}`);
+      const bytes = Buffer.from(await res.arrayBuffer());
+      const mime = sniffMime(bytes);
+      if (!mime) throw new Error(`unrecognized thumbnail bytes (${bytes.length}b)`);
+      return { bytes, mime };
+    };
+    try {
+      if (!img.thumb) throw new Error("no cached thumbnail link");
+      return await grab(img.thumb);
+    } catch {
+      const meta = await drive.files.get({ fileId: img.id, fields: "thumbnailLink", supportsAllDrives: true });
+      const fresh = meta.data.thumbnailLink;
+      if (!fresh) throw new Error("Drive returned no thumbnailLink");
+      img.thumb = fresh;
+      return await grab(fresh);
+    }
+  };
+
   let done = 0, kept = 0, rejected = 0, errored = 0;
   for (let i = 0; i < todo.length; i += CONC) {
     const batch = todo.slice(i, i + CONC);
     await Promise.all(batch.map(async (img) => {
       const key = `drive:${img.id}`;
       try {
-        const url = img.thumb!.replace(/=s\d+$/, "=s768");
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) throw new Error(`thumbnail fetch ${res.status}`);
-        const bytes = Buffer.from(await res.arrayBuffer());
-        const mime = sniffMime(bytes); // use the REAL type, not a hardcoded guess
-        if (!mime) throw new Error(`unrecognized thumbnail bytes (${bytes.length}b)`);
+        const { bytes, mime } = await loadThumb(img);
         const tags = await tagImage(bytes, mime);
         // First-level gate: only reusable assets earn a full record + later embedding.
         seen[key] = { u: tags.marketing_usable, r: tags.reusability, n: img.name, gv: GATE_VERSION };
@@ -158,9 +180,10 @@ async function main() {
           rejected++;
         }
       } catch (e) {
-        // Record the failure so it isn't re-fetched/re-tagged on every future run.
-        // (--force or a GATE_VERSION bump will retry it.)
-        seen[key] = { u: false, r: "error", n: img.name, gv: GATE_VERSION };
+        // Record the failure with an attempt count: it retries up to RETRY_CAP times on
+        // normal runs (so a fix auto-recovers it), then is left alone instead of spamming.
+        const attempts = (seen[key]?.errAttempts ?? 0) + 1;
+        seen[key] = { u: false, r: "error", n: img.name, gv: GATE_VERSION, errAttempts: attempts };
         delete index[key];
         errored++;
         process.stdout.write(`\n✗ ${img.name}: ${e instanceof Error ? e.message : e}\n`);
