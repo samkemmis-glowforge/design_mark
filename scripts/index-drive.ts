@@ -40,6 +40,17 @@ const FOLDER = process.env.DRIVE_FOLDER_ID;
 
 type Img = { id: string; name: string; mimeType: string; thumb?: string; web?: string; path: string };
 
+/** Detect image type from magic bytes — Drive thumbnails are often WebP/PNG, not the
+ *  JPEG we'd assume; sending the wrong MIME makes Gemini 400 "unable to process image". */
+function sniffMime(b: Buffer): string | null {
+  if (b.length < 12) return null;
+  if (b[0] === 0xff && b[1] === 0xd8) return "image/jpeg";
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "image/png";
+  if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return "image/gif";
+  if (b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP") return "image/webp";
+  return null;
+}
+
 async function main() {
   if (!FOLDER) { console.error("set DRIVE_FOLDER_ID"); process.exit(1); }
   const force = process.argv.includes("--force");
@@ -124,7 +135,7 @@ async function main() {
   const skip = images.length - todoAll.length;
   if (limit > 0 && todoAll.length > todo.length)
     console.log(`limiting to ${todo.length} of ${todoAll.length} remaining this run (re-run to continue)`);
-  let done = 0, kept = 0, rejected = 0;
+  let done = 0, kept = 0, rejected = 0, errored = 0;
   for (let i = 0; i < todo.length; i += CONC) {
     const batch = todo.slice(i, i + CONC);
     await Promise.all(batch.map(async (img) => {
@@ -132,8 +143,11 @@ async function main() {
       try {
         const url = img.thumb!.replace(/=s\d+$/, "=s768");
         const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error(`thumbnail fetch ${res.status}`);
         const bytes = Buffer.from(await res.arrayBuffer());
-        const tags = await tagImage(bytes, "image/jpeg");
+        const mime = sniffMime(bytes); // use the REAL type, not a hardcoded guess
+        if (!mime) throw new Error(`unrecognized thumbnail bytes (${bytes.length}b)`);
+        const tags = await tagImage(bytes, mime);
         // First-level gate: only reusable assets earn a full record + later embedding.
         seen[key] = { u: tags.marketing_usable, r: tags.reusability, n: img.name, gv: GATE_VERSION };
         if (tags.marketing_usable) {
@@ -143,16 +157,23 @@ async function main() {
           delete index[key]; // in case a prior run had kept it
           rejected++;
         }
-      } catch (e) { process.stdout.write(`\n✗ ${img.name}: ${e instanceof Error ? e.message : e}\n`); }
+      } catch (e) {
+        // Record the failure so it isn't re-fetched/re-tagged on every future run.
+        // (--force or a GATE_VERSION bump will retry it.)
+        seen[key] = { u: false, r: "error", n: img.name, gv: GATE_VERSION };
+        delete index[key];
+        errored++;
+        process.stdout.write(`\n✗ ${img.name}: ${e instanceof Error ? e.message : e}\n`);
+      }
     }));
     done += batch.length;
     await writeFile(INDEX, JSON.stringify(index, null, 2)); // checkpoint per batch
     await writeFile(SEEN, JSON.stringify(seen));
-    process.stdout.write(`triaged ${done}/${todo.length}  (kept ${kept}, rejected ${rejected}, skipped ${skip})\r`);
+    process.stdout.write(`triaged ${done}/${todo.length}  (kept ${kept}, rejected ${rejected}, errored ${errored}, skipped ${skip})\r`);
   }
   await writeFile(INDEX, JSON.stringify(index, null, 2));
   await writeFile(SEEN, JSON.stringify(seen));
-  console.log(`\ntriaged ${done}: kept ${kept} reusable, rejected ${rejected} one-off; skipped ${skip}. index has ${Object.keys(index).length} usable assets → assets/index.json`);
+  console.log(`\ntriaged ${done}: kept ${kept} reusable, rejected ${rejected} one-off, errored ${errored}; skipped ${skip}. index has ${Object.keys(index).length} usable assets → assets/index.json`);
   process.exit(0);
 }
 main().catch((e) => { console.error(e); process.exit(1); });
