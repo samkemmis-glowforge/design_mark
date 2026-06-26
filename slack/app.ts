@@ -77,7 +77,10 @@ async function main() {
       session.handleUserMessage(text);
       return;
     }
-    session = new ThreadSession(makeChannel(client, channel, threadTs));
+    const ch = makeChannel(client, channel, threadTs);
+    // Immediate receipt ack, posted before the (slower) agent spins up.
+    void ch.postText(":hourglass_flowing_sand: *On it* — Design Mark is working on your request…");
+    session = new ThreadSession(ch);
     sessions.set(key, session);
     void session.start(text);
   }
