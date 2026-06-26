@@ -33,10 +33,31 @@ function requireEnv(): { botToken: string; appToken: string } {
   return { botToken: botToken!, appToken: appToken! };
 }
 
-/** Build a ThreadChannel bound to a specific channel + thread. */
-function makeChannel(client: WebClient, channel: string, threadTs: string): ThreadChannel {
+/** Build a ThreadChannel bound to a specific channel + thread. Supports an editable
+ *  placeholder: postPlaceholder() posts the "On it" message; the FIRST postText() edits
+ *  that message in place, and later postText() calls post new messages as normal. */
+function makeChannel(
+  client: WebClient,
+  channel: string,
+  threadTs: string,
+): ThreadChannel & { postPlaceholder(text: string): Promise<void> } {
+  let placeholderTs: string | null = null;
+  let placeholderReady: Promise<void> | null = null;
   return {
+    postPlaceholder(text: string) {
+      placeholderReady = client.chat
+        .postMessage({ channel, thread_ts: threadTs, text, unfurl_links: false })
+        .then((r) => { placeholderTs = (r.ts as string) ?? null; });
+      return placeholderReady;
+    },
     async postText(text: string) {
+      if (placeholderReady) await placeholderReady; // ensure we know the placeholder's ts
+      if (placeholderTs) {
+        const ts = placeholderTs;
+        placeholderTs = null; // consume it — only the first reply replaces the placeholder
+        await client.chat.update({ channel, ts, text });
+        return;
+      }
       await client.chat.postMessage({ channel, thread_ts: threadTs, text, unfurl_links: false });
     },
     async uploadImage(path: string, comment: string) {
@@ -78,8 +99,8 @@ async function main() {
       return;
     }
     const ch = makeChannel(client, channel, threadTs);
-    // Immediate receipt ack, posted before the (slower) agent spins up.
-    void ch.postText(":hourglass_flowing_sand: *On it* — Design Mark is working on your request…");
+    // Immediate receipt ack; the agent's first reply edits this message in place.
+    void ch.postPlaceholder(":hourglass_flowing_sand: *On it* — Design Mark is working on your request…");
     session = new ThreadSession(ch);
     sessions.set(key, session);
     void session.start(text);
