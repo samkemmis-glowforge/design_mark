@@ -4,3 +4,14 @@ output
 approved
 *.log
 /tmp
+
+# Heavy assets the running bot never reads — keep them out of the image (~150MB lighter,
+# faster context upload + build). The bot only needs assets/index.json + embeddings.json
+# (search) and brand/ (references). These dirs are deliverables / indexer data / sources.
+assets/social
+assets/campaign
+assets/hero-layers
+assets/drive-listing.json
+assets/magic-engraver/*
+!assets/magic-engraver/subjects.json
+**/*.pptx

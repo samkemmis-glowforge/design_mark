@@ -1,6 +1,12 @@
-# Build the Slack-bot image from the named Dockerfile (Dockerfile.slack).
-# Invoked by slack/deploy_cloud_run.sh via: gcloud builds submit --config slack/cloudbuild.yaml
+# Build the Slack-bot image (Dockerfile.slack) with Kaniko layer caching.
+# Kaniko caches each layer (the apt Chromium install and `npm ci` especially) in the
+# registry, so repeat deploys reuse them instead of rebuilding every time — the big
+# recurring time saver. The npm ci layer only invalidates when package*.json changes.
+# Invoked by slack/deploy_cloud_run.sh: gcloud builds submit --config slack/cloudbuild.yaml
 steps:
-  - name: gcr.io/cloud-builders/docker
-    args: ["build", "-f", "Dockerfile.slack", "-t", "${_IMAGE}", "."]
-images: ["${_IMAGE}"]
+  - name: gcr.io/kaniko-project/executor:latest
+    args:
+      - --dockerfile=Dockerfile.slack
+      - --destination=${_IMAGE}
+      - --cache=true
+      - --cache-ttl=336h   # 14 days
