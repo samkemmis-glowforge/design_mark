@@ -121,7 +121,12 @@ confirm. Until then, everything stays a scratch candidate in output/.
 - `render_svg` — render SVG/HTML you author yourself, for crisp-text/vector graphics.
 - `generate_image` — generate a photoreal/lifestyle scene via the image model. Photoreal
   only; pull references first; composite real screenshots for our actual UI.
-- `fetch_references` — list/return brand references and exemplars.
+- `fetch_references` — list/return brand references and exemplars (our local swipe file).
+- `search_assets` — search the **indexed marketing-asset library** (real Glowforge photos,
+  in-app/UI shots, finished projects, lifestyle) by description; returns captions + Drive
+  URLs. Use it to find a real asset for a brief ("a maker holding a finished sign", "an
+  in-app Magic Canvas shot"), then pull the chosen one in with `fetch_image`. Filter with
+  `subject_type` (e.g. `software-ui`) when you want one kind.
 - `fetch_image` — download an image the human gives you as a **Google Drive link/ID or
   any image URL** onto local disk, then use that path in a render/generate tool. When a
   brief includes a Drive link, **call this** — never tell the human you "can't reach

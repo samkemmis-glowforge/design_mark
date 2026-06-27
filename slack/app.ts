@@ -50,14 +50,18 @@ function toSlackMrkdwn(s: string): string {
 function makeChannel(
   client: WebClient,
   channel: string,
-  threadTs: string | undefined,
-): ThreadChannel & { postPlaceholder(text: string): Promise<void> } {
+  initialThread: string | undefined,
+): ThreadChannel & { postPlaceholder(text: string): Promise<void>; setThread(ts: string | undefined): void } {
+  // `thread` is mutable: replies follow whichever thread the user's latest message is in,
+  // so a question asked in a nested thread is answered there (not in the main channel).
+  let thread = initialThread;
   let placeholderTs: string | null = null;
   let placeholderReady: Promise<void> | null = null;
   return {
+    setThread(ts: string | undefined) { thread = ts; },
     postPlaceholder(text: string) {
       placeholderReady = client.chat
-        .postMessage({ channel, thread_ts: threadTs, text: toSlackMrkdwn(text), unfurl_links: false })
+        .postMessage({ channel, thread_ts: thread, text: toSlackMrkdwn(text), unfurl_links: false })
         .then((r) => { placeholderTs = (r.ts as string) ?? null; });
       return placeholderReady;
     },
@@ -70,7 +74,7 @@ function makeChannel(
         await client.chat.update({ channel, ts, text: body });
         return;
       }
-      await client.chat.postMessage({ channel, thread_ts: threadTs, text: body, unfurl_links: false });
+      await client.chat.postMessage({ channel, thread_ts: thread, text: body, unfurl_links: false });
     },
     async uploadImage(path: string, comment: string) {
       const args: Record<string, unknown> = {
@@ -79,7 +83,7 @@ function makeChannel(
         filename: path.split("/").pop() ?? "asset.png",
         initial_comment: toSlackMrkdwn(comment),
       };
-      if (threadTs) args.thread_ts = threadTs;
+      if (thread) args.thread_ts = thread;
       await client.files.uploadV2(args as unknown as Parameters<typeof client.files.uploadV2>[0]);
     },
   };
@@ -100,23 +104,26 @@ async function main() {
     logLevel: LogLevel.INFO,
   });
 
-  // channel:threadTs -> session
-  const sessions = new Map<string, ThreadSession>();
+  // key -> { session, channel }. Keep the channel so we can re-point its reply thread.
+  type Entry = { session: ThreadSession; ch: ReturnType<typeof makeChannel> };
+  const sessions = new Map<string, Entry>();
 
-  // key -> session. For DMs the key is the channel (one ongoing conversation, so context
-  // survives across top-level messages); for channel @-mentions it's channel:threadTs.
+  // For DMs the key is the channel (one ongoing conversation, so context survives across
+  // top-level messages); for channel @-mentions it's channel:threadTs. `threadTs` is where
+  // THIS message lives — replies follow it, so a question in a nested thread is answered there.
   function routeMessage(client: WebClient, key: string, channel: string, threadTs: string | undefined, text: string) {
     if (!text) return;
-    let session = sessions.get(key);
-    if (session) {
-      session.handleUserMessage(text);
+    const existing = sessions.get(key);
+    if (existing) {
+      existing.ch.setThread(threadTs); // reply where the user is now
+      existing.session.handleUserMessage(text);
       return;
     }
     const ch = makeChannel(client, channel, threadTs);
     // Immediate receipt ack; the agent's first reply edits this message in place.
     void ch.postPlaceholder(":hourglass_flowing_sand: *On it* — Design Mark is working on your request…");
-    session = new ThreadSession(ch);
-    sessions.set(key, session);
+    const session = new ThreadSession(ch);
+    sessions.set(key, { session, ch });
     void session.start(text);
   }
 
@@ -134,9 +141,9 @@ async function main() {
     };
     if (m.subtype || m.bot_id) return;
     if (m.channel_type !== "im") return; // channels use @-mentions
-    // DM = one continuous session keyed by channel; reply at the DM top level (no thread),
-    // so sequential messages keep full context instead of each starting fresh.
-    routeMessage(client as WebClient, `dm:${m.channel}`, m.channel, undefined, (m.text ?? "").trim());
+    // DM = one continuous session keyed by channel (context survives across messages),
+    // but reply in the thread the user is actually using (m.thread_ts), not always top level.
+    routeMessage(client as WebClient, `dm:${m.channel}`, m.channel, m.thread_ts, (m.text ?? "").trim());
   });
 
   // @-mentions in channels — one session per thread.

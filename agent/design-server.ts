@@ -7,6 +7,7 @@ import { renderSvg } from "./tools/render-svg.js";
 import { approveAsset } from "./tools/approve-asset.js";
 import { fetchImage } from "./tools/fetch-image.js";
 import { saveToDrive } from "./tools/save-to-drive.js";
+import { searchAssets } from "./tools/asset-search.js";
 import { renderCanvaTemplate, getCanvaTemplateFields, handoffToCanva } from "./tools/canva-template.js";
 import { resolvePreset, presetCatalog } from "./presets.js";
 import { listTemplates } from "../templates/index.js";
@@ -34,6 +35,7 @@ export const DESIGN_TOOL_NAMES = [
   "mcp__design__render_svg",
   "mcp__design__generate_image",
   "mcp__design__fetch_references",
+  "mcp__design__search_assets",
   "mcp__design__fetch_image",
   "mcp__design__save_to_drive",
   "mcp__design__approve_asset",
@@ -185,6 +187,35 @@ export function buildDesignServer(transports: DesignHostTransports) {
     },
   );
 
+  const searchAssetsTool = tool(
+    "search_assets",
+    "Search the indexed marketing-asset library — real Glowforge photos, in-app/UI shots, finished projects, and " +
+      "lifestyle scenes catalogued from the marketing Drive — by natural-language description. Returns ranked matches " +
+      "with captions and Drive URLs. Use it to find a real asset to composite, then pull the chosen one in with " +
+      "fetch_image. Distinct from fetch_references (which is only our local brand swipe file).",
+    {
+      query: z.string().describe("Natural-language description of the asset you want (e.g. 'maker holding a finished sign')."),
+      limit: z.number().optional().describe("Max results (default 8)."),
+      subject_type: z
+        .enum(["hardware", "software-ui", "finished-project", "lifestyle", "packaging", "branding", "promo-graphic", "other"])
+        .optional()
+        .describe("Restrict to one subject type, e.g. 'software-ui' for in-app shots."),
+    },
+    async (args) => {
+      try {
+        const hits = await searchAssets(args.query, args.limit ?? 8, args.subject_type);
+        if (!hits.length) return text(`No indexed assets matched "${args.query}".`);
+        return text(
+          hits
+            .map((h) => `[${h.score}] ${h.name} (${h.subject_type}${h.product ? "/" + h.product : ""})\n  ${h.caption}\n  ${h.url ?? "(no url)"}`)
+            .join("\n\n"),
+        );
+      } catch (err) {
+        return text(`SEARCH FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
   const fetchImageTool = tool(
     "fetch_image",
     "Download an image the human gave you as a Google Drive link/ID (or any direct http(s) image URL) onto local " +
@@ -329,6 +360,7 @@ export function buildDesignServer(transports: DesignHostTransports) {
       renderSvgTool,
       generateImageTool,
       fetchReferencesTool,
+      searchAssetsTool,
       fetchImageTool,
       saveToDriveTool,
       approveAssetTool,
