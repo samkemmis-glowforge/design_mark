@@ -23,6 +23,21 @@ SECRETS+=",SLACK_APP_TOKEN=design-mark-slack-app-token:latest"
 SECRETS+=",ANTHROPIC_API_KEY=design-mark-anthropic-key:latest"
 SECRETS+=",GEMINI_API_KEY=design-mark-gemini-key:latest"
 
+ENVVARS="IMAGE_PROVIDER=gemini,GEMINI_IMAGE_MODEL=gemini-2.5-flash-image"
+
+# Optional: Drive write + restricted-file read. If a service-account-key secret exists,
+# mount it as a file and point the bot at it (so save_to_drive / restricted fetch work).
+# Skipped cleanly if the secret isn't set — public-link fetch still works either way.
+GDRIVE_SECRET="${GDRIVE_SECRET:-design-mark-gdrive-sa}"
+DRIVE_UPLOAD_FOLDER_ID="${DRIVE_UPLOAD_FOLDER_ID:-1nhAP7AK4sJkSV2qmC9z2cuD7CjTWXceJ}"
+if gcloud secrets describe "${GDRIVE_SECRET}" >/dev/null 2>&1; then
+  SECRETS+=",/secrets/gdrive-sa.json=${GDRIVE_SECRET}:latest"
+  ENVVARS+=",GOOGLE_APPLICATION_CREDENTIALS=/secrets/gdrive-sa.json,DRIVE_UPLOAD_FOLDER_ID=${DRIVE_UPLOAD_FOLDER_ID}"
+  echo "▸ Drive key '${GDRIVE_SECRET}' found — enabling Drive upload + restricted-file read."
+else
+  echo "▸ No Drive key secret ('${GDRIVE_SECRET}') — skipping Drive write (public-link fetch still works)."
+fi
+
 echo "▸ Building ${IMAGE} from Dockerfile.slack…"
 gcloud builds submit --config slack/cloudbuild.yaml --substitutions=_IMAGE="${IMAGE}" .
 
@@ -37,6 +52,6 @@ gcloud run deploy "${SERVICE}" \
   --memory 1Gi \
   --port 8080 \
   --set-secrets "${SECRETS}" \
-  --set-env-vars "IMAGE_PROVIDER=gemini,GEMINI_IMAGE_MODEL=gemini-2.5-flash-image"
+  --set-env-vars "${ENVVARS}"
 
 echo "✓ Deployed. Tail logs:  gcloud run services logs read ${SERVICE} --region ${REGION} --follow"
