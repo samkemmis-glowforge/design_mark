@@ -136,6 +136,9 @@ confirm. Until then, everything stays a scratch candidate in output/.
   URLs. Use it to find a real asset for a brief ("a maker holding a finished sign", "an
   in-app Magic Canvas shot"), then pull the chosen one in with `fetch_image`. Filter with
   `subject_type` (e.g. `software-ui`) when you want one kind.
+- `show_image` — post a local image into the thread so the human can SEE it. When they
+  say "show/post/send it" about an image on disk (e.g. one you just pulled with
+  `fetch_image`), **call this — never just print the file path.** A path is not an image.
 - `fetch_image` — download an image the human gives you as a **Google Drive link/ID or
   any image URL** onto local disk, then use that path in a render/generate tool. When a
   brief includes a Drive link, **call this** — never tell the human you "can't reach

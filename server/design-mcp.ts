@@ -145,6 +145,7 @@ function makeServer(): McpServer {
     const transports: DesignHostTransports = {
       askHuman: async () => "Proceed with your best judgment using the brand defaults; do not wait for input.",
       onAsset: async ({ path, width, height }) => { assets.push(`${urlFor(path)} (${width}×${height})`); },
+      showImage: async (path, caption) => { assets.push(`${urlFor(path)}${caption ? ` — ${caption}` : ""}`); },
     };
     try {
       const opts = await buildQueryOptions(buildDesignServer(transports));

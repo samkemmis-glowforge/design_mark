@@ -44,6 +44,9 @@ async function runBrief(brief: string): Promise<void> {
     onAsset: async ({ path, width, height }) => {
       console.log(`\n  \x1b[32m✓ asset:\x1b[0m ${path} (${width}×${height})`);
     },
+    showImage: async (path, caption) => {
+      console.log(`\n  \x1b[36m🖼  ${path}\x1b[0m${caption ? ` — ${caption}` : ""}`);
+    },
   };
 
   const server = buildDesignServer(transports);

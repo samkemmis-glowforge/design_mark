@@ -22,6 +22,9 @@ export interface DesignHostTransports {
   askHuman: (question: string, options?: string[]) => Promise<string>;
   /** Surface a finished asset (print path in CLI; upload to thread in Slack). */
   onAsset: (info: { path: string; width: number; height: number }) => Promise<void>;
+  /** Display an arbitrary local image in the conversation (e.g. a fetched photo the
+   *  human asked to see) — uploads to the Slack thread / prints the path in the CLI. */
+  showImage: (path: string, caption: string) => Promise<void>;
 }
 
 function text(s: string) {
@@ -37,6 +40,7 @@ export const DESIGN_TOOL_NAMES = [
   "mcp__design__fetch_references",
   "mcp__design__search_assets",
   "mcp__design__fetch_image",
+  "mcp__design__show_image",
   "mcp__design__save_to_drive",
   "mcp__design__approve_asset",
   "mcp__design__canva_template",
@@ -236,6 +240,25 @@ export function buildDesignServer(transports: DesignHostTransports) {
     },
   );
 
+  const showImageTool = tool(
+    "show_image",
+    "Post a local image file directly into the thread so the human can SEE it. Use whenever the human asks to " +
+      "'show', 'post', 'send', or 'see' an image you have on disk — e.g. one you just pulled in with fetch_image, or " +
+      "any existing asset path. Do NOT just print the file path; call this to actually upload it.",
+    {
+      path: z.string().describe("Local path of the image to display."),
+      caption: z.string().optional().describe("Optional one-line caption."),
+    },
+    async (args) => {
+      try {
+        await transports.showImage(args.path, args.caption ?? "");
+        return text(`Posted ${args.path} to the thread.`);
+      } catch (err) {
+        return text(`SHOW FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    },
+  );
+
   const saveToDriveTool = tool(
     "save_to_drive",
     "Upload a finished local asset to Google Drive and return its shareable link. Requires a service account " +
@@ -362,6 +385,7 @@ export function buildDesignServer(transports: DesignHostTransports) {
       fetchReferencesTool,
       searchAssetsTool,
       fetchImageTool,
+      showImageTool,
       saveToDriveTool,
       approveAssetTool,
       canvaTemplateFieldsTool,

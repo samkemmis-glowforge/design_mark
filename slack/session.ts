@@ -66,6 +66,7 @@ export class ThreadSession {
         }),
       onAsset: ({ path, width, height }) =>
         this.channel.uploadImage(path, `Candidate · ${width}×${height}`),
+      showImage: (path, caption) => this.channel.uploadImage(path, caption),
     };
 
     const server = buildDesignServer(transports);
