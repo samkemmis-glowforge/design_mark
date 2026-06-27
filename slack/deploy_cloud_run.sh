@@ -38,6 +38,22 @@ else
   echo "▸ No Drive key secret ('${GDRIVE_SECRET}') — skipping Drive write (public-link fetch still works)."
 fi
 
+# Optional: Canva uploads/templates. Needs a Canva Connect app (client id/secret secrets)
+# AND a GCS bucket to hold the rotating OAuth tokens durably (Cloud Run disk is ephemeral,
+# and Canva refresh tokens rotate — they must persist across restarts). Enable by setting
+# CANVA_BUCKET and storing the two canva secrets; seed gs://$CANVA_BUCKET/.canva-tokens.json
+# from a local `npm run canva:auth`. Skipped cleanly otherwise.
+CANVA_FLAGS=()
+CANVA_BUCKET="${CANVA_BUCKET:-}"
+if [ -n "${CANVA_BUCKET}" ] && gcloud secrets describe design-mark-canva-client-id >/dev/null 2>&1; then
+  SECRETS+=",CANVA_CLIENT_ID=design-mark-canva-client-id:latest,CANVA_CLIENT_SECRET=design-mark-canva-client-secret:latest"
+  ENVVARS+=",CANVA_TOKENS_PATH=/canva/.canva-tokens.json"
+  CANVA_FLAGS=(--add-volume "name=canva,type=cloud-storage,bucket=${CANVA_BUCKET}" --add-volume-mount "volume=canva,mount-path=/canva")
+  echo "▸ Canva configured — enabling uploads/templates (tokens in gs://${CANVA_BUCKET})."
+else
+  echo "▸ Canva not configured — skipping (set CANVA_BUCKET + the canva secrets to enable)."
+fi
+
 echo "▸ Building ${IMAGE} from Dockerfile.slack…"
 gcloud builds submit --config slack/cloudbuild.yaml --substitutions=_IMAGE="${IMAGE}" .
 
@@ -53,6 +69,7 @@ gcloud run deploy "${SERVICE}" \
   --cpu 2 \
   --port 8080 \
   --set-secrets "${SECRETS}" \
-  --set-env-vars "${ENVVARS}"
+  --set-env-vars "${ENVVARS}" \
+  ${CANVA_FLAGS[@]+"${CANVA_FLAGS[@]}"}
 
 echo "✓ Deployed. Tail logs:  gcloud run services logs read ${SERVICE} --region ${REGION} --follow"

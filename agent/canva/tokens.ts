@@ -11,7 +11,12 @@ export interface StoredTokens {
   expires_at: number;
 }
 
-const TOKENS_PATH = resolve(REPO_ROOT, ".canva-tokens.json");
+// Where the (rotating) Canva tokens persist. On a stateless host (Cloud Run) this MUST
+// point at durable, writable storage — e.g. a GCS bucket mounted as a volume — so a
+// refreshed token survives restarts. Defaults to a repo-local file for dev.
+const TOKENS_PATH = process.env.CANVA_TOKENS_PATH
+  ? resolve(process.env.CANVA_TOKENS_PATH)
+  : resolve(REPO_ROOT, ".canva-tokens.json");
 
 export async function saveTokens(t: TokenResponse): Promise<void> {
   const stored: StoredTokens = {
