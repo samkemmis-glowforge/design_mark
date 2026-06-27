@@ -21,9 +21,16 @@ async function main() {
   const port = Number(process.env.CANVA_REDIRECT_PORT ?? 8976);
   const redirectUri = process.env.CANVA_REDIRECT_URI ?? `http://127.0.0.1:${port}/callback`;
 
+  // Scopes: default to the full set, but allow narrowing via CANVA_SCOPES (space/comma
+  // separated) — e.g. uploads only ("asset:read asset:write") when the account lacks the
+  // Enterprise brand-template scopes, which otherwise fail the whole authorize.
+  const scopes = process.env.CANVA_SCOPES
+    ? process.env.CANVA_SCOPES.split(/[\s,]+/).filter(Boolean)
+    : DEFAULT_SCOPES;
+
   const pkce = createPkce();
   const state = randomBytes(16).toString("hex");
-  const authorizeUrl = buildAuthorizeUrl({ clientId, redirectUri, challenge: pkce.challenge, state, scopes: DEFAULT_SCOPES });
+  const authorizeUrl = buildAuthorizeUrl({ clientId, redirectUri, challenge: pkce.challenge, state, scopes });
 
   const code: string = await new Promise((resolveCode, reject) => {
     const server = createServer((req, res) => {
