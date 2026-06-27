@@ -49,7 +49,8 @@ gcloud run deploy "${SERVICE}" \
   --min-instances 1 --max-instances 1 \
   --no-cpu-throttling \
   --concurrency 1 \
-  --memory 1Gi \
+  --memory 2Gi \
+  --cpu 2 \
   --port 8080 \
   --set-secrets "${SECRETS}" \
   --set-env-vars "${ENVVARS}"

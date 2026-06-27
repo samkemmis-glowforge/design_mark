@@ -41,14 +41,16 @@ export async function htmlToPng(opts: HtmlToPngOptions): Promise<HtmlToPngResult
       deviceScaleFactor,
     });
     const page = await context.newPage();
-    await page.setContent(html, { waitUntil: "networkidle" });
+    // Bound every step so a stuck render fails loudly (catchable) instead of hanging forever.
+    page.setDefaultTimeout(45_000);
+    await page.setContent(html, { waitUntil: "networkidle", timeout: 30_000 });
     // Ensure embedded webfonts are fully parsed before snapshot.
     await page.evaluate(async () => {
       // @ts-ignore - document.fonts exists in the browser context
       if (document.fonts?.ready) await document.fonts.ready;
     });
     await mkdir(dirname(outPath), { recursive: true });
-    const buffer = await page.screenshot({ type: "png", fullPage, omitBackground });
+    const buffer = await page.screenshot({ type: "png", fullPage, omitBackground, timeout: 45_000 });
     await writeFile(outPath, buffer);
     return { outPath, width, height, bytes: buffer.length };
   } finally {
