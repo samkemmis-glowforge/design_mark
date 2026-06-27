@@ -38,17 +38,19 @@ async function downloadImage(url: string, headers?: Record<string, string>): Pro
   return sniff(buf) ? buf : null; // reject HTML sign-in / interstitial pages
 }
 
-async function viaDriveApi(id: string): Promise<Buffer | null> {
-  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) return null;
+async function viaDriveApi(id: string): Promise<{ bytes: Buffer } | { error: string }> {
+  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS)
+    return { error: "no service account is configured on this bot (GOOGLE_APPLICATION_CREDENTIALS is unset)" };
   try {
     const { google } = await import("googleapis");
     const auth = new google.auth.GoogleAuth({ scopes: ["https://www.googleapis.com/auth/drive.readonly"] });
     const drive = google.drive({ version: "v3", auth: auth as never });
     const r = await drive.files.get({ fileId: id, alt: "media", supportsAllDrives: true }, { responseType: "arraybuffer" });
     const buf = Buffer.from(r.data as ArrayBuffer);
-    return sniff(buf) ? buf : null;
-  } catch {
-    return null;
+    return sniff(buf) ? { bytes: buf } : { error: "service account downloaded the file but it is not an image" };
+  } catch (e) {
+    const err = e as { errors?: { message?: string }[]; message?: string };
+    return { error: `service account read failed (${err.errors?.[0]?.message ?? err.message ?? String(e)})` };
   }
 }
 
@@ -64,11 +66,15 @@ export async function fetchImage(source: string, nameHint = "incoming"): Promise
 
   if (id) {
     bytes = await downloadImage(`https://drive.google.com/uc?export=download&id=${id}&confirm=t`);
-    if (!bytes) bytes = await viaDriveApi(id);
-    if (!bytes)
-      throw new Error(
-        'Could not read that Drive file. Set it to "Anyone with the link → Viewer", or share it with the indexer service account, then try again.',
-      );
+    if (!bytes) {
+      const sa = await viaDriveApi(id);
+      if ("bytes" in sa) bytes = sa.bytes;
+      else
+        throw new Error(
+          `Could not read Drive file ${id}: the public link is blocked, and ${sa.error}. ` +
+            `Fix: share it "Anyone with the link → Viewer", or grant the bot's service account Viewer on it.`,
+        );
+    }
   } else if (/^https?:\/\//.test(source.trim())) {
     bytes = await downloadImage(source.trim());
     if (!bytes) throw new Error("That URL did not return an image (got HTML or a non-image response).");
